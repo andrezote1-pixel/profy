@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Profy</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Profy">
+<meta name="theme-color" content="#0b1530">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{display:flex;align-items:center;justify-content:center;padding:28px;padding-top:max(28px,env(safe-area-inset-top));background:radial-gradient(circle at 30% 20%,#1d3d8f,#0b1530 60%);color:#eef3ff;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}
+.box{max-width:380px;width:100%}
+img{width:104px;height:104px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+h1{font-size:30px;margin-top:18px}
+.sub{opacity:.7;margin-top:2px}
+#msg{margin-top:22px;opacity:.85;min-height:22px}
+.spin{width:26px;height:26px;margin:18px auto 0;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:g 1s linear infinite}
+@keyframes g{to{transform:rotate(360deg)}}
+button{display:none;width:100%;margin-top:22px;padding:15px;border:0;border-radius:14px;background:#fff;color:#1f2937;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.dica{display:none;margin-top:22px;padding:16px;border-radius:16px;background:rgba(255,255,255,.08);text-align:left;font-size:14px}
+.dica p{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="box">
+<img src="apple-touch-icon.png" alt="">
+<h1>Profy</h1>
+<p class="sub">Sala de aula no bolso</p>
+<p id="msg">Abrindo…</p>
+<div class="spin" id="spin"></div>
+<button id="entrar" type="button">Entrar com Google</button>
+<div class="dica" id="dica">
+<p><b>Para instalar no iPhone ou iPad:</b></p>
+<p>1. No Safari, toque em <b>Compartilhar</b> (quadrado com a seta).</p>
+<p>2. Toque em <b>Adicionar à Tela de Início</b> e depois em <b>Adicionar</b>.</p>
+</div>
+</div>
+<script>
+var CID='936559144488-kd5vmk9fqqm8o0aaopfd3i85fbc9jd73.apps.googleusercontent.com';
+var RED=location.origin+'/profy/';
+var SC=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/script.scriptapp','https://www.googleapis.com/auth/userinfo.email'].join(' ');
+
+/* camada que liga o app ao Google (vai junto para dentro do app) */
+function PROFY_PONTE(){
+  var DEP='AKfycbzf8JetbruoOTSFXTFuxqVmWCBJ3x5Aoqw1pbXvsfEqXlOEL6M5Z8ps8XUvFcBQGtqrJg';
+  function ler(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+  function gravar(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function tok(){var t=ler('profy-tok',null);return t&&t.exp>Date.now()+30000?t.t:null}
+  function chamar(fn,args){
+    var m=args&&args[0];
+    if(fn==='salvarVarios'&&m){var p=ler('profy-pend',{});for(var k in m)p[k]=m[k];gravar('profy-pend',p)}
+    var t=tok();
+    if(!t){if(window.PROFY_SESSAO)PROFY_SESSAO();return Promise.reject(new Error('sessao'))}
+    var corpo=JSON.stringify({'function':fn,parameters:args||[],devMode:false});
+    return fetch('https://script.googleapis.com/v1/scripts/'+DEP+':run',{method:'POST',keepalive:corpo.length<60000,
+      headers:{'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:corpo})
+    .then(function(r){
+      if(r.status===401){try{localStorage.removeItem('profy-tok')}catch(e){}if(window.PROFY_SESSAO)PROFY_SESSAO();throw new Error('sessao')}
+      return r.json()})
+    .then(function(j){
+      if(j.error){var d=j.error.details&&j.error.details[0];throw new Error((d&&d.errorMessage)||j.error.message||'erro')}
+      if(fn==='salvarVarios'&&m){var p=ler('profy-pend',{});for(var k in m)if(p[k]===m[k])delete p[k];gravar('profy-pend',p)}
+      return j.response&&j.response.result});
+  }
+  function corredor(ok,falha){return new Proxy({},{get:function(_,nome){
+    if(nome==='withSuccessHandler')return function(f){return corredor(f,falha)};
+    if(nome==='withFailureHandler')return function(f){return corredor(ok,f)};
+    if(nome==='withUserObject')return function(){return corredor(ok,falha)};
+    return function(){var a=[].slice.call(arguments);chamar(nome,a).then(function(r){if(ok)ok(r)},function(e){if(falha)falha(e)})};
+  }})}
+  window.google=window.google||{};window.google.script={run:corredor()};
+  window.PROFY_CHAMAR=chamar;
+  window.PROFY_SESSAO=function(){
+    if(!document.body||document.getElementById('profy-sessao')||document.getElementById('entrar'))return;
+    var b=document.createElement('button');b.id='profy-sessao';b.type='button';
+    b.textContent='Sessão expirada · toque para reconectar';
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);z-index:99999;padding:10px 16px;border:0;border-radius:999px;background:#f59e0b;color:#111;font:600 14px -apple-system,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3)';
+    b.onclick=function(){location.href=location.origin+'/profy/?entrar=1'};
+    document.body.appendChild(b);
+  };
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible'&&!tok()&&navigator.onLine&&!document.getElementById('entrar'))location.href=location.origin+'/profy/?entrar=1';
+  });
+}
+PROFY_PONTE();
+
+var $=function(i){return document.getElementById(i)};
+function msg(t){$('msg').textContent=t}
+function tela(t,botao){msg(t);$('spin').style.display='none';$('entrar').style.display=botao?'block':'none';
+  if(botao&&!navigator.standalone&&/iPhone|iPad/.test(navigator.userAgent))$('dica').style.display='block'}
+function ler(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function tok(){var t=ler('profy-tok',null);return t&&t.exp>Date.now()+30000?t.t:null}
+
+function auth(silencioso){
+  var e=ler('profy-email','');
+  var q={client_id:CID,redirect_uri:RED,response_type:'token',scope:SC,include_granted_scopes:'true',state:silencioso?'s':'i'};
+  q.prompt=silencioso?'none':'select_account';
+  if(e)q.login_hint=e;
+  location.href='https://accounts.google.com/o/oauth2/v2/auth?'+new URLSearchParams(q).toString();
+}
+$('entrar').onclick=function(){auth(false)};
+
+function escrever(html){
+  var ponte='<script>('+PROFY_PONTE.toString()+')();<\/script>';
+  html=/<head[^>]*>/i.test(html)?html.replace(/<head[^>]*>/i,function(h){return h+ponte}):ponte+html;
+  document.open();document.write(html);document.close();
+}
+
+function iniciar(){
+  msg('Carregando seus dados…');
+  var email=ler('profy-email','');
+  var cache=email?localStorage.getItem('profy-html:'+email):null;
+  var pend=ler('profy-pend',{});
+  var fila=Object.keys(pend).length?PROFY_CHAMAR('salvarVarios',[pend]).catch(function(){}):Promise.resolve();
+  var pagina=function(){return PROFY_CHAMAR('pagina',[]).then(function(r){
+    try{localStorage.setItem('profy-email',JSON.stringify(r.email||''));localStorage.setItem('profy-html:'+(r.email||''),r.html)}catch(e){}
+    return r})};
+  if(cache){fila.then(function(){pagina().catch(function(){});escrever(cache)});return}
+  fila.then(pagina).then(function(r){escrever(r.html)},function(e){
+    if(String(e&&e.message)==='sessao'){tela('Entre com sua conta Google para continuar.',true);return}
+    tela('Não consegui abrir agora: '+(e&&e.message||'erro')+'. Tente de novo.',true)});
+}
+
+(function(){
+  var h=new URLSearchParams(location.hash.replace(/^#/,''));
+  var s=new URLSearchParams(location.search);
+  var erro=h.get('error');
+  if(h.get('access_token')){
+    try{localStorage.setItem('profy-tok',JSON.stringify({t:h.get('access_token'),exp:Date.now()+(+h.get('expires_in')||3600)*1000}))}catch(e){}
+  }
+  if(location.hash||location.search)history.replaceState(null,'',RED);
+  if(tok())return iniciar();
+  if(!navigator.onLine){var e=ler('profy-email','');var c=e&&localStorage.getItem('profy-html:'+e);if(c)return escrever(c)}
+  if(erro){tela('Entre com sua conta Google para continuar.',true);return}
+  if(ler('profy-email','')||s.get('entrar'))return auth(true);
+  tela('Bem-vindo! Entre com sua conta Google para começar.',true);
+})();
+</script>
+</body>
+</html>

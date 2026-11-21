@@ -41,11 +41,12 @@ button{display:none;width:100%;margin-top:22px;padding:15px;border:0;border-radi
 <p>1. No Safari, toque em <b>Compartilhar</b> (quadrado com a seta).</p>
 <p>2. Toque em <b>Adicionar à Tela de Início</b> e depois em <b>Adicionar</b>.</p>
 </div>
+<p style="margin-top:26px;font-size:12px;opacity:.55">Desenvolvido por André Gonzaga Aires</p>
 </div>
 <script>
 var CID='936559144488-kd5vmk9fqqm8o0aaopfd3i85fbc9jd73.apps.googleusercontent.com';
 var RED=location.origin+'/profy/';
-var SC=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/script.scriptapp','https://www.googleapis.com/auth/userinfo.email'].join(' ');
+var SC=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/script.scriptapp','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'].join(' ');
 
 /* camada que liga o app ao Google (vai junto para dentro do app) */
 function PROFY_PONTE(){
@@ -113,8 +114,15 @@ function escrever(html){
   document.open();document.write(html);document.close();
 }
 
+function perfilGoogle(){
+  var t=tok();if(!t)return Promise.resolve();
+  return fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{'Authorization':'Bearer '+t}}).then(function(r){return r.ok?r.json():null}).then(function(g){
+    if(g&&g.email){try{localStorage.setItem('profy-g',JSON.stringify({given_name:g.given_name||'',family_name:g.family_name||'',picture:g.picture||'',email:g.email}))}catch(e){}}
+  }).catch(function(){});
+}
 function iniciar(){
   msg('Carregando seus dados…');
+  var pg=perfilGoogle();
   var email=ler('profy-email','');
   var cache=email?localStorage.getItem('profy-html:'+email):null;
   var pend=ler('profy-pend',{});
@@ -123,7 +131,7 @@ function iniciar(){
     try{localStorage.setItem('profy-email',JSON.stringify(r.email||''));localStorage.setItem('profy-html:'+(r.email||''),r.html)}catch(e){}
     return r})};
   if(cache){fila.then(function(){pagina().catch(function(){});escrever(cache)});return}
-  fila.then(pagina).then(function(r){escrever(r.html)},function(e){
+  fila.then(pagina).then(function(r){return pg.then(function(){escrever(r.html)})},function(e){
     if(String(e&&e.message)==='sessao'){tela('Entre com sua conta Google para continuar.',true);return}
     tela('Não consegui abrir agora: '+(e&&e.message||'erro')+'. Tente de novo.',true)});
 }

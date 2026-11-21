@@ -17,25 +17,44 @@
 html,body{height:100%}
 body{display:flex;align-items:center;justify-content:center;padding:28px;padding-top:max(28px,env(safe-area-inset-top));background:radial-gradient(circle at 30% 20%,#1d3d8f,#0b1530 60%);color:#eef3ff;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}
 .box{max-width:380px;width:100%}
-img{width:104px;height:104px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.logo{width:104px;height:104px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
 h1{font-size:30px;margin-top:18px}
 .sub{opacity:.7;margin-top:2px}
 #msg{margin-top:22px;opacity:.85;min-height:22px}
+#msg.erro{color:#ffb4b4;opacity:1}
 .spin{width:26px;height:26px;margin:18px auto 0;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:g 1s linear infinite}
 @keyframes g{to{transform:rotate(360deg)}}
-button{display:none;width:100%;margin-top:22px;padding:15px;border:0;border-radius:14px;background:#fff;color:#1f2937;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.btn{display:none;width:100%;margin-top:14px;padding:15px;border:0;border-radius:14px;background:#fff;color:#1f2937;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;cursor:pointer}
+.btn.sec{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+#entrar{margin-top:22px}
+.form{display:none;margin-top:18px;text-align:left}
+.form label{display:block;margin-top:12px;font-size:13px;font-weight:600;opacity:.8}
+.form input{display:block;width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;font:500 16px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.form input:focus{outline:2px solid #6ea8ff;outline-offset:1px}
+.form .btn{display:block}
+.links{display:flex;justify-content:space-between;margin-top:14px;font-size:14px}
+.links a{color:#9cc3ff;text-decoration:none;cursor:pointer}
 .dica{display:none;margin-top:22px;padding:16px;border-radius:16px;background:rgba(255,255,255,.08);text-align:left;font-size:14px}
 .dica p{margin:4px 0}
 </style>
 </head>
 <body>
 <div class="box">
-<img src="apple-touch-icon.png" alt="">
+<img class="logo" src="apple-touch-icon.png" alt="">
 <h1>Profy</h1>
 <p class="sub">Sala de aula no bolso</p>
 <p id="msg">Abrindo…</p>
 <div class="spin" id="spin"></div>
-<button id="entrar" type="button">Entrar com Google</button>
+<button class="btn" id="entrar" type="button">Entrar com Google</button>
+<button class="btn sec" id="comemail" type="button">Entrar com e-mail e senha</button>
+<form class="form" id="form" novalidate>
+  <label id="l-nome">Seu nome<input id="f-nome" autocomplete="name" placeholder="ex.: Maria Souza"></label>
+  <label>E-mail<input id="f-email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" placeholder="voce@exemplo.com"></label>
+  <label id="l-senha">Senha<input id="f-senha" type="password" autocomplete="current-password" placeholder="Pelo menos 6 caracteres"></label>
+  <button class="btn" id="f-ok" type="submit">Entrar</button>
+  <div class="links"><a id="f-troca">Criar conta</a><a id="f-esqueci">Esqueci a senha</a></div>
+  <div class="links"><a id="f-voltar">‹ Voltar</a></div>
+</form>
 <div class="dica" id="dica">
 <p><b>Para instalar no iPhone ou iPad:</b></p>
 <p>1. No Safari, toque em <b>Compartilhar</b> (quadrado com a seta).</p>
@@ -47,6 +66,7 @@ button{display:none;width:100%;margin-top:22px;padding:15px;border:0;border-radi
 var CID='936559144488-kd5vmk9fqqm8o0aaopfd3i85fbc9jd73.apps.googleusercontent.com';
 var RED=location.origin+'/profy/';
 var SC=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar','https://www.googleapis.com/auth/script.scriptapp','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'].join(' ');
+var FB_KEY='AIzaSyBZSt0mqCnS0sbAu_xmASeieIZH1MvTejE';
 
 /* camada que liga o app ao Google (vai junto para dentro do app) */
 function PROFY_PONTE(){
@@ -90,13 +110,77 @@ function PROFY_PONTE(){
     if(document.visibilityState==='visible'&&!tok()&&navigator.onLine&&!document.getElementById('entrar'))location.href=location.origin+'/profy/?entrar=1';
   });
 }
-PROFY_PONTE();
+
+/* camada das contas com e-mail e senha: guarda os dados no Firebase (vai junto para dentro do app) */
+function PROFY_PONTE_FB(){
+  var KEY='AIzaSyBZSt0mqCnS0sbAu_xmASeieIZH1MvTejE',PRJ='profy-515414';
+  var BASE='https://firestore.googleapis.com/v1/projects/'+PRJ+'/databases/(default)/documents';
+  function ler(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+  function gravar(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  function sessao(){return ler('profy-fb',null)}
+  function token(){
+    var s=sessao();if(!s)return Promise.reject(new Error('sessao'));
+    if(s.exp>Date.now()+60000)return Promise.resolve(s);
+    return fetch('https://securetoken.googleapis.com/v1/token?key='+KEY,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(s.rt)})
+      .then(function(r){if(r.status===400||r.status===401||r.status===403)throw new Error('sessao');return r.json()})
+      .then(function(j){if(!j.id_token)throw new Error('sessao');s.id=j.id_token;s.rt=j.refresh_token||s.rt;s.exp=Date.now()+(+j.expires_in||3600)*1000;gravar('profy-fb',s);return s});
+  }
+  function docId(k){return String(k).replace(/[^A-Za-z0-9_-]/g,function(c){return '~'+c.charCodeAt(0).toString(16)})}
+  function carregar(){
+    return token().then(function(s){
+      if(ler('profy-uid','')!==s.uid){
+        try{Object.keys(localStorage).forEach(function(k){if(/^(cad-|_)/.test(k))localStorage.removeItem(k)})}catch(e){}
+        gravar('profy-uid',s.uid);
+      }
+      var dados={};
+      function pagina(pt){
+        return fetch(BASE+'/usuarios/'+s.uid+'/dados?pageSize=300'+(pt?'&pageToken='+encodeURIComponent(pt):''),{headers:{'Authorization':'Bearer '+s.id}})
+          .then(function(r){if(r.status===401||r.status===403)throw new Error('sessao');return r.json()})
+          .then(function(j){(j.documents||[]).forEach(function(d){var f=d.fields||{};if(f.k&&f.v)dados[f.k.stringValue]=f.v.stringValue});return j.nextPageToken?pagina(j.nextPageToken):null});
+      }
+      return pagina(null).then(function(){return {dados:dados,agenda:null,planilha:'',nome:s.nome||''}});
+    });
+  }
+  function salvarVarios(m){
+    var p=ler('profy-pend-fb',{});for(var k in m)p[k]=m[k];gravar('profy-pend-fb',p);
+    return token().then(function(s){
+      var agora=new Date().toISOString();
+      var writes=Object.keys(m).map(function(k){return {update:{name:'projects/'+PRJ+'/databases/(default)/documents/usuarios/'+s.uid+'/dados/'+docId(k),fields:{k:{stringValue:k},v:{stringValue:m[k]==null?'':String(m[k])},t:{timestampValue:agora}}}}});
+      var corpo=JSON.stringify({writes:writes});
+      return fetch(BASE+':commit',{method:'POST',keepalive:corpo.length<60000,headers:{'Authorization':'Bearer '+s.id,'Content-Type':'application/json'},body:corpo})
+        .then(function(r){if(r.status===401||r.status===403)throw new Error('sessao');if(!r.ok)throw new Error('erro '+r.status);
+          var q=ler('profy-pend-fb',{});for(var k in m)if(q[k]===m[k])delete q[k];gravar('profy-pend-fb',q);return agora});
+    });
+  }
+  function chamar(fn,args){
+    var p=fn==='carregar'?carregar():fn==='salvarVarios'?salvarVarios((args&&args[0])||{}):Promise.resolve(null);
+    return p.catch(function(e){if(String(e&&e.message)==='sessao'&&window.PROFY_SESSAO)PROFY_SESSAO();throw e});
+  }
+  function corredor(ok,falha){return new Proxy({},{get:function(_,nome){
+    if(nome==='withSuccessHandler')return function(f){return corredor(f,falha)};
+    if(nome==='withFailureHandler')return function(f){return corredor(ok,f)};
+    if(nome==='withUserObject')return function(){return corredor(ok,falha)};
+    return function(){var a=[].slice.call(arguments);chamar(nome,a).then(function(r){if(ok)ok(r)},function(e){if(falha)falha(e)})};
+  }})}
+  window.google=window.google||{};window.google.script={run:corredor()};
+  window.PROFY_CHAMAR=chamar;
+  window.PROFY_SAIR=function(){try{localStorage.removeItem('profy-fb');localStorage.removeItem('profy-modo')}catch(e){}location.href=location.origin+'/profy/'};
+  window.PROFY_SESSAO=function(){
+    if(!document.body||document.getElementById('profy-sessao')||document.getElementById('entrar'))return;
+    var b=document.createElement('button');b.id='profy-sessao';b.type='button';
+    b.textContent='Sessão expirada · toque para entrar de novo';
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 8px);z-index:99999;padding:10px 16px;border:0;border-radius:999px;background:#f59e0b;color:#111;font:600 14px -apple-system,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.3)';
+    b.onclick=function(){try{localStorage.removeItem('profy-fb')}catch(e){}location.href=location.origin+'/profy/?email=1'};
+    document.body.appendChild(b);
+  };
+}
 
 var $=function(i){return document.getElementById(i)};
-function msg(t){$('msg').textContent=t}
-function tela(t,botao){msg(t);$('spin').style.display='none';$('entrar').style.display=botao?'block':'none';
+function msg(t,erro){$('msg').textContent=t;$('msg').className=erro?'erro':''}
+function tela(t,botao){msg(t);$('spin').style.display='none';$('entrar').style.display=botao?'block':'none';$('comemail').style.display=botao?'block':'none';$('form').style.display='none';
   if(botao&&!navigator.standalone&&/iPhone|iPad/.test(navigator.userAgent))$('dica').style.display='block'}
 function ler(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function gravar(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function tok(){var t=ler('profy-tok',null);return t&&t.sc===SC&&t.exp>Date.now()+30000?t.t:null}
 
 function auth(silencioso){
@@ -106,10 +190,10 @@ function auth(silencioso){
   if(e)q.login_hint=e;
   location.href='https://accounts.google.com/o/oauth2/v2/auth?'+new URLSearchParams(q).toString();
 }
-$('entrar').onclick=function(){auth(false)};
+$('entrar').onclick=function(){try{localStorage.removeItem('profy-modo')}catch(e){}auth(false)};
 
-function escrever(html){
-  var ponte='<script>('+PROFY_PONTE.toString()+')();<\/script>';
+function escrever(html,ponteFn){
+  var ponte='<script>('+(ponteFn||PROFY_PONTE).toString()+')();<\/script>';
   html=/<head[^>]*>/i.test(html)?html.replace(/<head[^>]*>/i,function(h){return h+ponte}):ponte+html;
   var ir=function(){setTimeout(function(){document.open();document.write(html);document.close()},0)};
   if(document.readyState==='complete')ir();else window.addEventListener('load',ir);
@@ -123,6 +207,7 @@ function perfilGoogle(){
 }
 function iniciar(){
   msg('Carregando seus dados…');
+  PROFY_PONTE();
   var pg=perfilGoogle();
   var email=ler('profy-email','');
   var cache=email?localStorage.getItem('profy-html:'+email):null;
@@ -133,8 +218,64 @@ function iniciar(){
     return r})};
   if(cache){fila.then(function(){pagina().catch(function(){});escrever(cache)});return}
   fila.then(pagina).then(function(r){return pg.then(function(){escrever(r.html)})},function(e){
-    if(String(e&&e.message)==='sessao'){tela('Entre com sua conta Google para continuar.',true);return}
+    if(String(e&&e.message)==='sessao'){tela('Entre com sua conta para continuar.',true);return}
     tela('Não consegui abrir agora: '+(e&&e.message||'erro')+'. Tente de novo.',true)});
+}
+
+/* ---------- contas com e-mail e senha ---------- */
+var modoForm='entrar';
+function abrirForm(m){
+  modoForm=m||'entrar';$('spin').style.display='none';$('entrar').style.display='none';$('comemail').style.display='none';$('dica').style.display='none';
+  $('form').style.display='block';
+  $('l-nome').style.display=modoForm==='criar'?'block':'none';
+  $('l-senha').style.display=modoForm==='esqueci'?'none':'block';
+  $('f-senha').setAttribute('autocomplete',modoForm==='criar'?'new-password':'current-password');
+  $('f-ok').textContent=modoForm==='criar'?'Criar conta':modoForm==='esqueci'?'Enviar link para trocar a senha':'Entrar';
+  $('f-troca').textContent=modoForm==='entrar'?'Criar conta':'Já tenho conta';
+  $('f-esqueci').style.display=modoForm==='entrar'?'inline':'none';
+  msg(modoForm==='criar'?'Crie sua conta do Profy.':modoForm==='esqueci'?'Informe o e-mail da sua conta.':'Entre com seu e-mail e senha.');
+}
+$('comemail').onclick=function(){abrirForm('entrar')};
+$('f-troca').onclick=function(){abrirForm(modoForm==='entrar'?'criar':'entrar')};
+$('f-esqueci').onclick=function(){abrirForm('esqueci')};
+$('f-voltar').onclick=function(){tela('Entre com sua conta para começar.',true)};
+var ERROS={EMAIL_EXISTS:'Já existe uma conta com esse e-mail. Toque em "Já tenho conta".',EMAIL_NOT_FOUND:'Não achei conta com esse e-mail.',INVALID_PASSWORD:'Senha incorreta.',INVALID_LOGIN_CREDENTIALS:'E-mail ou senha incorretos.',INVALID_EMAIL:'Esse e-mail não parece válido.',MISSING_PASSWORD:'Digite a senha.',WEAK_PASSWORD:'A senha precisa ter pelo menos 6 caracteres.',TOO_MANY_ATTEMPTS_TRY_LATER:'Muitas tentativas. Espere alguns minutos e tente de novo.',USER_DISABLED:'Essa conta foi desativada.'};
+function erroFB(j){var c=(j&&j.error&&j.error.message)||'';c=c.split(' ')[0].split(':')[0];return ERROS[c]||'Não deu certo ('+(c||'sem conexão')+'). Tente de novo.'}
+function idt(rota,corpo){return fetch('https://identitytoolkit.googleapis.com/v1/accounts:'+rota+'?key='+FB_KEY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(corpo)}).then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j})})}
+$('form').onsubmit=function(ev){
+  ev.preventDefault();
+  var email=$('f-email').value.trim().toLowerCase(),senha=$('f-senha').value,nome=$('f-nome').value.trim();
+  if(!email){msg('Digite seu e-mail.',true);return}
+  if(modoForm==='criar'&&!nome){msg('Digite seu nome.',true);return}
+  $('f-ok').disabled=true;msg('Um instante…');
+  var fim=function(){$('f-ok').disabled=false};
+  if(modoForm==='esqueci'){
+    idt('sendOobCode',{requestType:'PASSWORD_RESET',email:email}).then(function(){fim();abrirForm('entrar');msg('Pronto! Veja seu e-mail (e a caixa de spam) para criar uma senha nova.')},function(j){fim();msg(erroFB(j),true)});
+    return;
+  }
+  var p=modoForm==='criar'
+    ?idt('signUp',{email:email,password:senha,returnSecureToken:true}).then(function(j){return idt('update',{idToken:j.idToken,displayName:nome,returnSecureToken:false}).then(function(){j.displayName=nome;return j},function(){j.displayName=nome;return j})})
+    :idt('signInWithPassword',{email:email,password:senha,returnSecureToken:true});
+  p.then(function(j){
+    var nm=(j.displayName||'').trim(),partes=nm.split(/\s+/);
+    gravar('profy-fb',{id:j.idToken,rt:j.refreshToken,exp:Date.now()+(+j.expiresIn||3600)*1000,uid:j.localId,email:j.email||email,nome:nm});
+    gravar('profy-modo','email');
+    gravar('profy-g',{given_name:partes[0]||'',family_name:partes.slice(1).join(' '),picture:'',email:j.email||email});
+    fim();iniciarEmail();
+  },function(j){fim();msg(erroFB(j),true)});
+};
+
+function htmlEmail(){
+  return fetch('app-branco.html?v='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('app '+r.status);return r.text()}).then(function(h){try{localStorage.setItem('profy-html-email',h)}catch(e){}return h});
+}
+function iniciarEmail(){
+  msg('Carregando seus dados…');$('form').style.display='none';$('spin').style.display='block';
+  PROFY_PONTE_FB();
+  var cache=localStorage.getItem('profy-html-email');
+  var pend=ler('profy-pend-fb',{});
+  var fila=Object.keys(pend).length?PROFY_CHAMAR('salvarVarios',[pend]).catch(function(){}):Promise.resolve();
+  if(cache){fila.then(function(){htmlEmail().catch(function(){});escrever(cache,PROFY_PONTE_FB)});return}
+  fila.then(htmlEmail).then(function(h){escrever(h,PROFY_PONTE_FB)},function(e){tela('Não consegui abrir agora: '+(e&&e.message||'erro')+'. Tente de novo.',true)});
 }
 
 (function(){
@@ -142,14 +283,21 @@ function iniciar(){
   var s=new URLSearchParams(location.search);
   var erro=h.get('error');
   if(h.get('access_token')){
-    try{localStorage.setItem('profy-tok',JSON.stringify({t:h.get('access_token'),sc:SC,exp:Date.now()+(+h.get('expires_in')||3600)*1000}))}catch(e){}
+    try{localStorage.setItem('profy-tok',JSON.stringify({t:h.get('access_token'),sc:SC,exp:Date.now()+(+h.get('expires_in')||3600)*1000}));localStorage.removeItem('profy-modo');
+      if(ler('profy-uid','g')!=='g'){Object.keys(localStorage).forEach(function(k){if(/^(cad-|_)/.test(k))localStorage.removeItem(k)});gravar('profy-uid','g')}}catch(e){}
   }
   if(location.hash||location.search)history.replaceState(null,'',RED);
+  if(s.get('sair')){try{['profy-fb','profy-modo','profy-tok'].forEach(function(k){localStorage.removeItem(k)})}catch(e){}tela('Você saiu. Entre com sua conta para continuar.',true);return}
+  if(ler('profy-modo','')==='email'){
+    if(ler('profy-fb',null)){if(!navigator.onLine){var c0=localStorage.getItem('profy-html-email');if(c0){PROFY_PONTE_FB();return escrever(c0,PROFY_PONTE_FB)}}return iniciarEmail()}
+    tela('',true);abrirForm('entrar');return;
+  }
+  if(s.get('email')){tela('',true);abrirForm('entrar');return}
   if(tok())return iniciar();
-  if(!navigator.onLine){var e=ler('profy-email','');var c=e&&localStorage.getItem('profy-html:'+e);if(c)return escrever(c)}
-  if(erro){tela('Entre com sua conta Google para continuar.',true);return}
+  if(!navigator.onLine){var e=ler('profy-email','');var c=e&&localStorage.getItem('profy-html:'+e);if(c){PROFY_PONTE();return escrever(c)}}
+  if(erro){tela('Entre com sua conta para continuar.',true);return}
   if(ler('profy-email','')||s.get('entrar'))return auth(true);
-  tela('Bem-vindo! Entre com sua conta Google para começar.',true);
+  tela('Bem-vindo! Entre com sua conta para começar.',true);
 })();
 </script>
 </body>

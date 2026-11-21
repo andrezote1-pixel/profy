@@ -931,6 +931,14 @@ body.onb-on{overflow:hidden}
 #onb .ob-me img,#onb .ob-me>span{width:52px;height:52px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:linear-gradient(135deg,#4ea2ff,#8f6be6);color:#fff;font-weight:800;flex:none}
 #onb .ob-me b{font-size:17px}
 .credito{margin:14px 2px 0;font-size:12px;color:var(--ink-3);text-align:center}
+
+.pushbox{display:flex;flex-direction:column;gap:6px;margin:14px 0 4px;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.pushbox.on{background:color-mix(in srgb,var(--ok) 14%,transparent);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.pushbox b{font-size:15px}
+.pushbox span{font-size:13px;color:var(--ink-2)}
+.pushbox button{align-self:flex-start;margin-top:6px;min-height:42px;padding:0 16px;border-radius:12px;font:700 14px var(--font);cursor:pointer}
+.pushbox .pb1{border:0;background:var(--accent-2);color:#fff}
+.pushbox .pb2{border:1px solid var(--stroke);background:var(--soft);color:var(--ink)}
 </style>
 </head>
 <body>
@@ -1790,7 +1798,7 @@ document.addEventListener('click',e=>{
 $('al-add').addEventListener('click',()=>{const nm=$('al-novo').value.trim();if(!nm)return;const t=byId(selTurma),a=alunos(t);(U.alAdd[t.id]=U.alAdd[t.id]||[]).push(nm);a.push({nome:nm,freq:100,n1a:null,n1p:null,n2a:null,n2p:null,rec:null,p:'P',cor:CORES[a.length%CORES.length]});a.sort((x,y)=>x.nome.localeCompare(y.nome,'pt-BR'));t.n=a.length;salvaU();$('al-novo').value='';renderAlunos();toast(nm+' adicionado')});
 
 /* ---------- avisos ---------- */
-const PREF_G=[['Avisos principais',[['aula24','Aula em 24 horas','Matéria, instituição, turma, horário e sala'],['aula30','Aula em 30 minutos','O mesmo aviso, meia hora antes'],['receb','Dia do pagamento','Salário, 13º e bolsas, com o líquido estimado'],['prova','Prova em 7 dias','Para montar e imprimir a prova'],['dout','Doutorado em dia de aula','Na segunda e na terça da mesma semana: plano para quem vai substituir e atividade da turma']]],
+const PREF_G=[['No celular · tela bloqueada e por cima da tela',[['aula24','Aula em 24 horas','Matéria, instituição, turma, horário e sala'],['aula30','Aula em 30 minutos','O mesmo aviso, meia hora antes'],['receb','Dia do pagamento','Salário, 13º e bolsas, com o líquido estimado'],['prova','Prova em 7 dias','Para montar e imprimir a prova'],['dout','Doutorado em dia de aula','Na segunda e na terça da mesma semana: plano para quem vai substituir e atividade da turma']]],
  ['Só no sininho do app',[['semplano','Aula sem plano','2 dias antes, com as sugestões'],['conf','Confirmar aula dada','Às 23h dos dias de aula'],['sem','Seminário: 1 aula antes','Para pedir à turma que se prepare'],['lanc','Notas das provas da UAB','No domingo depois de cada prova, para lançar no Moodle UAB'],['tutoria','Relatórios das tutorias','RTP da UNITINS e relatório da UAB'],['descanso','Semana acima do limite','No sábado anterior'],['feriado','Feriado que tira aula','1 semana antes, para avisar as turmas']]]];
 const PUSH=new Set(['aula24','aula30','receb','prova','dout']);
 const PREF=Object.assign(Object.fromEntries(PREF_G.flatMap(g=>g[1]).map(x=>[x[0],true])),store.get('cad-avisos',{}));
@@ -1828,20 +1836,30 @@ function avisos(R){const L=[],add=(quando,tipo,cor,ic,tit,txt,go)=>{if(PREF[tipo
 function syncAgenda(forcar){try{
   if(typeof google==='undefined'||!google.script||!google.script.run)return;
   const agora=Date.now(),fim=agora+21*864e5;
-  const L=PREF.agenda===false?[]:avisos([addD(HOJE,-1),addD(HOJE,23)]).filter(a=>PUSH.has(a.tipo)&&a.at.getTime()>agora+60000&&a.at.getTime()<=fim);
+  const L=avisos([addD(HOJE,-1),addD(HOJE,23)]).filter(a=>PUSH.has(a.tipo)&&a.at.getTime()>agora+60000&&a.at.getTime()<=fim);
   const vistos=new Set(),lista=[];
   L.sort((a,b)=>a.at-b.at).forEach(a=>{const k=a.tipo+'|'+a.at.getTime()+'|'+a.tit.length+'|'+a.tit.slice(0,24);if(vistos.has(k))return;vistos.add(k);lista.push({k,t:a.tit,d:a.txt,ms:a.at.getTime()})});
-  const sig=JSON.stringify(lista.map(x=>[x.k,x.d]));
+  const push=!!(window.PROFY_PUSH_ESTADO&&PROFY_PUSH_ESTADO()==='ativo'),ag=(PREF.agenda===false||push)?[]:lista;
+  const sig=JSON.stringify([push,ag.length,lista.map(x=>[x.k,x.d])]);
   if(!forcar&&store.get('cad-ag-sig','')===sig&&agora-store.get('cad-ag-ts',0)<12*36e5)return;
-  google.script.run.withSuccessHandler(r=>{if(r&&r.restam){setTimeout(()=>syncAgenda(true),3000);return}store.set('cad-ag-sig',sig);store.set('cad-ag-ts',Date.now());if(forcar&&r&&(r.novos||r.apagados))toast(PREF.agenda===false?'Avisos tirados do Google Agenda':'Avisos enviados ao Google Agenda')}).withFailureHandler(()=>{}).sincronizarAgenda(lista,agora-36e5,fim+864e5);
+  if(push)try{PROFY_PUSH_SYNC(lista.map(x=>({k:x.k,t:x.t,b:x.d,at:x.ms})))}catch(_){}
+  google.script.run.withSuccessHandler(r=>{if(r&&r.restam){setTimeout(()=>syncAgenda(true),3000);return}store.set('cad-ag-sig',sig);store.set('cad-ag-ts',Date.now());if(forcar&&!push&&r&&(r.novos||r.apagados))toast(PREF.agenda===false?'Avisos tirados do Google Agenda':'Avisos enviados ao Google Agenda')}).withFailureHandler(()=>{}).sincronizarAgenda(ag,agora-36e5,fim+864e5);
 }catch(_){}}
 let VISTO=new Date(store.get('cad-avisos-visto',addD(AGORA,-1).getTime()));
 function badge(){const n=avisos().filter(a=>a.at>VISTO).length;document.querySelectorAll('.nbadge').forEach(b=>{b.textContent=n;b.style.display=n?'':'none'})}
 const diaRot=d=>{const x=new Date(d);x.setHours(0,0,0,0);const h=new Date(HOJE);h.setHours(0,0,0,0);const df=Math.round((h-x)/864e5);return df===0?'Hoje':df===1?'Ontem':dShort(x)};
+function pushHtml(){const e=window.PROFY_PUSH_ESTADO?PROFY_PUSH_ESTADO():'sem-ponte';
+  if(e==='ativo')return '<div class="pushbox on"><b>Notificações do Profy ligadas</b><span>Os avisos do grupo “No celular” chegam na tela do aparelho, com o ícone do Profy.</span><button type="button" class="pb2" data-push="off">Desligar</button></div>';
+  if(e==='inativo')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Aula, pagamento, prova e doutorado aparecem na tela bloqueada, com o ícone do Profy.</span><button type="button" class="pb1" data-push="on">Ativar notificações do Profy</button></div>';
+  if(e==='negado')return '<div class="pushbox"><b>Notificações bloqueadas</b><span>Libere em Ajustes do iPhone › Notificações › Profy e volte aqui.</span></div>';
+  if(e==='sem-suporte')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Abra o Profy pelo ícone na Tela de Início do iPhone (iOS 16.4 ou mais novo) para ligar as notificações.</span></div>';
+  return ''}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-push]');if(!b)return;const on=b.dataset.push==='on';b.disabled=true;b.textContent=on?'Ativando…':'Desligando…';
+  (on?PROFY_PUSH_ATIVAR():PROFY_PUSH_DESATIVAR()).then(()=>{toast(on?'Notificações do Profy ligadas':'Notificações do Profy desligadas');syncAgenda(true);renderAvisos()}).catch(err=>{const m=String(err&&err.message||err);toast(m==='negado'?'Notificações bloqueadas no iPhone':'Não deu para ativar agora: '+m);renderAvisos()})});
 function renderAvisos(){const L=avisos().slice(0,60);let g='',h='';
-  L.forEach(a=>{const r=diaRot(a.at),novo=a.at>VISTO;if(r!==g){g=r;h+=`<div class="nt-grp">${r}</div>`}h+=`<div class="nt${novo?' novo':''}" data-av-go="${a.go}" style="cursor:pointer"><span class="ic" style="background:${a.cor}">${a.ic}</span><div class="t"><b>${a.tit}</b><span>${a.txt}</span></div><time>${String(a.at.getHours()).padStart(2,'0')}h${String(a.at.getMinutes()).padStart(2,'0')}</time></div>`});
+  L.forEach(a=>{const r=diaRot(a.at),novo=a.at>VISTO;if(r!==g){g=r;h+=`<div class="nt-grp">${r}</div>`}h+=`<div class="nt${novo?' novo':''}" data-av-go="${a.go}" style="cursor:pointer"><span class="ic" style="background:${a.cor}">${a.ic}</span><div class="t"><b>${a.tit}${PUSH.has(a.tipo)?'<span class="pushtag">📱 celular</span>':''}</b><span>${a.txt}</span></div><time>${String(a.at.getHours()).padStart(2,'0')}h${String(a.at.getMinutes()).padStart(2,'0')}</time></div>`});
   $('av-lista').innerHTML=h||'<p class="demo">Nenhum aviso chegou ainda.</p>';
-  $('av-pref').innerHTML=PREF_G.map(([gr,l])=>`<div class="prefgrp">${gr}</div>`+l.map(([k,t,d])=>`<div class="sw2"><div class="t"><b>${t}</b><span>${d}</span></div><button class="tog" type="button" data-pref="${k}" aria-pressed="${!!PREF[k]}" aria-label="${t}"></button></div>`).join('')).join('')+'<p class="ccnote">Os avisos aparecem aqui, no sininho do app. A notificação na tela do celular chega numa próxima versão.</p>';
+  $('av-pref').innerHTML=pushHtml()+PREF_G.map(([gr,l])=>`<div class="prefgrp">${gr}</div>`+l.map(([k,t,d])=>`<div class="sw2"><div class="t"><b>${t}</b><span>${d}</span></div><button class="tog" type="button" data-pref="${k}" aria-pressed="${!!PREF[k]}" aria-label="${t}"></button></div>`).join('')).join('')+'<p class="ccnote">Os avisos também aparecem aqui, no sininho do app.</p>';
   setTimeout(()=>{VISTO=new Date(AGORA.getTime()+1000);store.set('cad-avisos-visto',VISTO.getTime());badge()},1500)}
 function abrirAvisos(){go('avisos')}
 document.addEventListener('click',e=>{const p=e.target.closest('[data-pref]');if(p){PREF[p.dataset.pref]=!PREF[p.dataset.pref];store.set('cad-avisos',PREF);VER++;renderAvisos();badge();syncAgenda(true);return}

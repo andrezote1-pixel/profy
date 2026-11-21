@@ -46,7 +46,7 @@ button{display:none;width:100%;margin-top:22px;padding:15px;border:0;border-radi
 <script>
 var CID='936559144488-kd5vmk9fqqm8o0aaopfd3i85fbc9jd73.apps.googleusercontent.com';
 var RED=location.origin+'/profy/';
-var SC=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar.readonly','https://www.googleapis.com/auth/script.scriptapp','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'].join(' ');
+var SC=['https://www.googleapis.com/auth/spreadsheets','https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/calendar','https://www.googleapis.com/auth/script.scriptapp','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'].join(' ');
 
 /* camada que liga o app ao Google (vai junto para dentro do app) */
 function PROFY_PONTE(){
@@ -97,7 +97,7 @@ function msg(t){$('msg').textContent=t}
 function tela(t,botao){msg(t);$('spin').style.display='none';$('entrar').style.display=botao?'block':'none';
   if(botao&&!navigator.standalone&&/iPhone|iPad/.test(navigator.userAgent))$('dica').style.display='block'}
 function ler(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}}
-function tok(){var t=ler('profy-tok',null);return t&&t.exp>Date.now()+30000?t.t:null}
+function tok(){var t=ler('profy-tok',null);return t&&t.sc===SC&&t.exp>Date.now()+30000?t.t:null}
 
 function auth(silencioso){
   var e=ler('profy-email','');
@@ -142,7 +142,7 @@ function iniciar(){
   var s=new URLSearchParams(location.search);
   var erro=h.get('error');
   if(h.get('access_token')){
-    try{localStorage.setItem('profy-tok',JSON.stringify({t:h.get('access_token'),exp:Date.now()+(+h.get('expires_in')||3600)*1000}))}catch(e){}
+    try{localStorage.setItem('profy-tok',JSON.stringify({t:h.get('access_token'),sc:SC,exp:Date.now()+(+h.get('expires_in')||3600)*1000}))}catch(e){}
   }
   if(location.hash||location.search)history.replaceState(null,'',RED);
   if(tok())return iniciar();

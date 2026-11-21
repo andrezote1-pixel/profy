@@ -744,7 +744,7 @@ main{padding-top:calc(env(safe-area-inset-top) + 26px)}
 .tcard .stats{margin-top:auto}
 .tcard .stats + .acts,.tcard .prog + .acts{margin-top:0}
 .tcard .idrow .inst{white-space:nowrap}
-.tcard h3 .newtag{vertical-align:3px;margin-left:4px}
+.tcard h3 .newtag{vertical-align:3px;margin-left:4px}.fonte .t b .newtag{display:inline-block;color:#fff;font-size:10.5px}.fonte .t b .realtag{display:inline-block;color:var(--accent);font-size:10.5px}.alert:empty{display:none}
 @media (min-width:900px){
   .topacts{flex-wrap:wrap;justify-content:flex-end;max-width:220px;row-gap:8px}
   .topacts .saved{order:9;flex-basis:100%;justify-content:flex-end;background:none;padding:0 4px;font-size:12px}
@@ -1236,6 +1236,7 @@ const SOBRE=['Alves','Araújo','Barbosa','Cardoso','Carvalho','Costa','Dias','Fe
 const CORES=['#5a8dee','#f08a5d','#3fb7a0','#b56be0','#e8b03a','#e0607e','#4aa3d8','#7bbf4a'];
 const q=v=>Math.round(v*2)/2;
 function alunos(t){
+  if(!t)return [];
   if(t._a)return t._a;
   const r=rng(t.id),used=new Set(),out=[];
   while(false&&out.length<t.n){
@@ -1434,6 +1435,7 @@ document.addEventListener('click',e=>{
 function abrirAula(id,dt){selAula={id,dt};editSala=false;renderAula();go('aula')}
 function renderAula(){
   if(!selAula)return;
+  if(!byId(selAula.id)){selAula=null;if(location.hash==='#aula')go('hoje');return}
   const{id,dt}=selAula,t=byId(id),p=plano(id,dt),tag=tagProva(id,dt),m=modo(id,dt),fer=feriadosDoDia(dt);
   $('au-eyebrow').textContent=dLong(dt);
   $('h-aula').textContent=t.nome;
@@ -1461,7 +1463,7 @@ $('au-edit').addEventListener('click',()=>toast('No app real, abre o editor do p
 
 /* ---------- ALUNOS ---------- */
 function renderAlunos(){
-  const t=byId(selTurma),a=alunos(t);
+  const t=byId(selTurma)||AULAS[0]||TURMAS[0];if(!t){go('turmas');return}const a=alunos(t);
   $('al-eyebrow').textContent=`${t.inst} · ${t.sub}`;$('h-alunos').textContent=t.nome;
   if(t.tipo==='tutoria'){$('al-sum').innerHTML=`<span class="pill">${t.n} alunos acompanhados</span>`;$('al-lista').innerHTML=a.map(s=>`<div class="stu"><div class="av" style="background:${s.cor}" data-esp-novo="${t.id}|${s.nome}" role="button" tabindex="0" title="Situação especial">${ini(s.nome)}</div><div class="t"><b>${s.nome}</b>${espTag(t,s)?`<span>${espTag(t,s)}</span>`:''}<span>Tutoria · ${t.local}</span></div></div>`).join('');return}
   $('al-sum').innerHTML=`<span class="pill">${t.n} alunos</span><span class="pill"><i style="background:var(--bad)"></i>${a.filter(s=>s.freq<75).length} abaixo de 75%</span>`;
@@ -1785,7 +1787,7 @@ const salvaU=()=>{VER++;store.set('cad-user',U)};
 function aplicaUsuario(){VER++;
   U.turmas.forEach(t=>{if(!TURMAS.some(x=>x.id===t.id))TURMAS.push(Object.assign({tipo:'aula',dadas:0,total:20,prova:7,ativ:3,on:'nao',portal:t.inst==='IFTO'?'Moodle IFTO':'Portal FASEC',fonte:''},t))});
   U.semTurma.forEach(id=>{const i=TURMAS.findIndex(x=>x.id===id);if(i>=0)TURMAS.splice(i,1)});
-  AULAS.length=0;TURMAS.filter(t=>t.tipo==='aula').forEach(t=>AULAS.push(t));
+  AULAS.length=0;TURMAS.filter(t=>t.tipo==='aula').forEach(t=>AULAS.push(t));try{fillSelects()}catch(_){}try{PEND=PEND.filter(p=>byId(p.turma))}catch(_){}
   U.fontes.forEach(f=>{if(!FONTES.some(x=>x.k===f.k))FONTES.push(f)});
   U.semFonte.forEach(k=>{const i=FONTES.findIndex(x=>x.k===k);if(i>=0)FONTES.splice(i,1)});
   Object.entries(U.pessoal).forEach(([k,l])=>{PESSOAL[k]=(PESSOAL[k]||[]).filter(x=>!l.includes(x)).concat(l)});
@@ -1929,7 +1931,7 @@ const datasTurma=(()=>{const C={};return id=>{if(C[id]&&C[id].v===VER)return C[i
 function numAula(id,dt){const l=datasTurma(id),i=l.findIndex(x=>keyOf(x)===keyOf(dt));return i<0?'':String(i+1).padStart(2,'0')+'/'+String(l.length).padStart(2,'0')}
 const esfRot=e=>e==='Federal'||e==='Estadual'?'Feriado':e==='Municipal'?'Feriado municipal':e==='Facultativo'?'Ponto facultativo':e;
 function linhaFer(f,dt){
-  const af=f.afeta.filter(id=>!f.mantida.includes(id)).map(id=>byId(id).nome),mt=f.mantida.map(id=>numAula(id,dt)?'Aula '+numAula(id,dt)+' de '+byId(id).nome.split(' · ')[0]:byId(id).nome);
+  const af=f.afeta.filter(id=>byId(id)&&!f.mantida.includes(id)).map(id=>byId(id).nome),mt=f.mantida.filter(id=>byId(id)).map(id=>numAula(id,dt)?'Aula '+numAula(id,dt)+' de '+byId(id).nome.split(' · ')[0]:byId(id).nome);
   const txt=af.length?'Sem aula: '+[...new Set(af)].join(', ')+(mt.length?' · '+mt.join(', '):''):mt.length?mt.join(', '):(f.esf==='Recesso'?'':'Não mexe em nenhuma aula sua');
   return `<div class="fer"><div class="dd"><b>${dt.getDate()}</b><small>${dt.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')}</small></div><div class="t"><b>${f.nome}</b><span>${f.cid?f.cid+' · ':''}${txt}</span></div><span class="esf ${f.esf}">${esfRot(f.esf)}</span></div>`}
 
@@ -2040,12 +2042,12 @@ function abrirFJ(i){const t=byId(chTurma.value),s=alunos(t)[i],cur=s.jm||'';
   $('sheet').classList.add('on');let sel=cur&&!FJ_M.includes(cur)?'Outro':cur;
   $('fj-ops').addEventListener('click',ev=>{const b=ev.target.closest('[data-fj]');if(!b)return;sel=b.dataset.fj;$('fj-ops').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));$('fj-out').hidden=sel!=='Outro';if(sel==='Outro')$('fj-txt').focus()});
   $('fj-ok').addEventListener('click',()=>{if(!sel){toast('Escolha o motivo');return}const m=sel==='Outro'?($('fj-txt').value.trim()||'Outro'):sel;s.p='J';s.jm=m;$('sheet').classList.remove('on');renderChamadaLista();toast('FJ · '+m)})}
-function renderChamadaLista(){const t=byId(chTurma.value),a=alunos(t);if(!a.length){$('ch-lista').innerHTML=`<div class="vazio" style="padding:18px">Esta turma ainda não tem alunos. Adicione em Turmas → ${t.nome} → Alunos.</div>`;sumChamada();return}
+function renderChamadaLista(){const t=byId(chTurma.value)||AULAS[0];if(!t)return;const a=alunos(t);if(!a.length){$('ch-lista').innerHTML=`<div class="vazio" style="padding:18px">Esta turma ainda não tem alunos. Adicione em Turmas → ${t.nome} → Alunos.</div>`;sumChamada();return}
   $('ch-lista').innerHTML=a.map((s,i)=>`<div class="stu"><div class="av" style="background:${s.cor}" data-esp-novo="${t.id}|${s.nome}" role="button" tabindex="0" title="Situação especial">${ini(s.nome)}</div><div class="t"><b>${s.nome}</b><span class="${s.p==='J'?'fjm':s.freq<75?'low':''}">${espTag(t,s)}${s.p==='J'?'FJ · '+(s.jm||'motivo não informado'):'Freq. '+s.freq+'%'}</span></div><div class="pfj" role="group" aria-label="Presença de ${s.nome}">${[['P','Presente'],['F','Falta'],['J','Falta justificada']].map(([v,l])=>`<button type="button" data-i="${i}" data-v="${v}" aria-pressed="${s.p===v}" aria-label="${l}">${v==='J'?'FJ':v}</button>`).join('')}</div></div>`).join('');sumChamada()}
 let chSel=null;
 function renderChamada(){
   if(!AULAS.length){$('ch-lista').innerHTML='<div class="vazio" style="padding:18px">Nenhuma turma cadastrada. Cadastre em Turmas → + Nova turma (ligue o modo de edição).</div>';$('ch-sum').innerHTML='';$('ch-status').innerHTML='';$('ch-data').innerHTML='';return}
-  const t=byId(chTurma.value),a=alunos(t),L=datasTurma(t.id);
+  const t=byId(chTurma.value)||AULAS[0],a=alunos(t),L=datasTurma(t.id);
   if(!chSel||chSel.id!==t.id||!L.some(x=>keyOf(x)===chSel.k))chSel={id:t.id,k:keyOf(proxData(t.id))};
   const d=fromKey(chSel.k),p=plano(t.id,d),hk=keyOf(HOJE),sv=CHS[t.id+'|'+chSel.k];
   a.forEach(s=>{s.p=sv&&sv.f[s.nome]||'P';s.jm=sv&&sv.m&&sv.m[s.nome]||'';if(!sv){const e=espDe(t,s.nome);if(e&&e.tipo==='dom'&&e.ini<=chSel.k&&chSel.k<=e.fim){s.p='J';s.jm='Exercícios domiciliares'}}});
@@ -2062,7 +2064,7 @@ $('ch-lista').addEventListener('click',e=>{const b=e.target.closest('[data-v]');
 chTurma.addEventListener('change',renderChamada);
 $('ch-data').addEventListener('change',e=>{chSel={id:chTurma.value,k:e.target.value};renderChamada()});
 $('todos-p').addEventListener('click',()=>{alunos(byId(chTurma.value)).forEach(s=>s.p='P');renderChamada();toast('Todos marcados como presentes')});
-$('ch-salvar').addEventListener('click',()=>{const t=byId(chTurma.value),a=alunos(t),f=a.filter(s=>s.p==='F').length,ex={},mo={};a.forEach(s=>{if(s.p!=='P')ex[s.nome]=s.p;if(s.p==='J')mo[s.nome]=s.jm||''});
+$('ch-salvar').addEventListener('click',()=>{const t=byId(chTurma.value);if(!t){toast('Cadastre uma turma primeiro');return}const a=alunos(t),f=a.filter(s=>s.p==='F').length,ex={},mo={};a.forEach(s=>{if(s.p!=='P')ex[s.nome]=s.p;if(s.p==='J')mo[s.nome]=s.jm||''});
   CHS[t.id+'|'+chSel.k]={f:ex,m:mo,ts:Date.now()};store.set('cad-chamada',CHS);marcaSalvo();renderChamada();toast(`Chamada de ${dShort(fromKey(chSel.k))} salva · ${a.length-f} presentes, ${f} faltas`)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-chamada-dia]');if(!b)return;const[id,k]=b.dataset.chamadaDia.split('|');chTurma.value=id;chSel={id,k};renderChamada();go('chamada')});
 
@@ -2116,7 +2118,7 @@ function abrirAtiv(id){const t=byId(ntTurma.value),L=ativs(t),a=id?L.find(x=>x.i
   if(a)$('at-del').addEventListener('click',()=>{ATV[t.id]=ATV[t.id].filter(x=>x.id!==a.id);store.set('cad-atv',ATV);alunos(t).forEach(s=>{if(s.at)delete s.at[a.id];somaAtiv(t,s)});ntAba='todas';$('sheet').classList.remove('on');renderNotas();toast('Atividade excluída')})}
 function renderNotas(){
   if(!AULAS.length){$('nt-head').innerHTML='';$('nt-body').innerHTML='<tr><td style="padding:18px">Nenhuma turma cadastrada ainda.</td></tr>';$('nt-sum').innerHTML='';$('nt-atabs').hidden=true;return}
-  const t=byId(ntTurma.value),a=alunos(t),narrow=innerWidth<700;aplicaNotas(t);notasAtiv(t);
+  const t=byId(ntTurma.value)||AULAS[0],a=alunos(t),narrow=innerWidth<700;aplicaNotas(t);notasAtiv(t);
   if(ntModo===null)ntModo=narrow?'resumo':'detalhado';
   if(ntAba!=='todas'&&!ativs(t).some(x=>x.id===ntAba))ntAba='todas';
   $('nt-modo').innerHTML=[['resumo','Resumo'],['detalhado','Atividades + prova']].map(([k,l])=>`<button type="button" data-nm="${k}" aria-pressed="${k===ntModo}">${l}</button>`).join('');
@@ -2190,16 +2192,16 @@ $('lc-copiar').addEventListener('click',async()=>{const p=PEND.find(x=>x.id===se
 /* ---------- CALENDÁRIO ---------- */
 const CAMADAS=[['aula','Aulas','var(--accent)'],['prova','Provas','var(--exam)'],['fer','Feriados','var(--bad)'],['pessoal','Agenda pessoal','var(--ink-2)'],['rel','Relatórios','var(--warn)']];
 const ligadas=new Set(CAMADAS.map(c=>c[0]));
-let calM=10,calSel=new Date(HOJE);
+const mesAbs=d=>(d.getFullYear()-2026)*12+d.getMonth();let calM=Math.max(6,mesAbs(HOJE)),calSel=new Date(HOJE);
 function renderCal(){
   $('layers').innerHTML=CAMADAS.map(([k,l,c])=>`<button type="button" data-layer="${k}" aria-pressed="${ligadas.has(k)}"><i style="background:${c}"></i>${l}</button>`).join('');
-  const y=2026,first=new Date(y,calM,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+  const y=2026,cm=((calM%12)+12)%12,first=new Date(y,calM,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
   $('cal-mes').textContent=first.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   let h=['seg','ter','qua','qui','sex','sáb','dom'].map(d=>`<div class="wd">${d}</div>`).join('');
   for(let i=0;i<42;i++){
     const d=new Date(start);d.setDate(start.getDate()+i);
-    if(i>=35&&d.getMonth()!==calM)break;
-    const ev=eventos(d).filter(e=>ligadas.has(e.tipo)),out=d.getMonth()!==calM,fer=ev.some(e=>e.tipo==='fer'&&e.f.esf!=='Facultativo'&&e.f.esf!=='Recesso');
+    if(i>=35&&d.getMonth()!==cm)break;
+    const ev=eventos(d).filter(e=>ligadas.has(e.tipo)),out=d.getMonth()!==cm,fer=ev.some(e=>e.tipo==='fer'&&e.f.esf!=='Facultativo'&&e.f.esf!=='Recesso');
     const dots=ev.filter(e=>e.tipo!=='fer').slice(0,5).map(e=>`<i class="${e.tipo==='prova'?'pv':''}" style="background:${corEv(e)}"></i>`).join('');
     h+=`<button type="button" class="day${out?' out':''}${fer?' hol':''}${+d===+HOJE?' today':''}" aria-pressed="${+d===+calSel}" data-day="${+d}" aria-label="${d.toLocaleDateString('pt-BR')}: ${ev.length} itens"><span class="d">${d.getDate()}</span><span class="dots">${dots}</span></button>`;
   }
@@ -2217,10 +2219,10 @@ function renderDia(){
     return `<div class="ev"><span class="time">${e.h||'—'}</span><span class="bar" style="background:${corEv(e)}"></span><div class="t"><b>${e.nome}</b><span>${e.tipo==='rel'?'Tutoria':'Google Agenda'}</span></div>${e.tipo==='pessoal'&&!e.nome.startsWith('Doutorado')?`<button class="xdel ed-only" type="button" data-del-pes="${keyOf(calSel)}::${e.nome}" aria-label="Remover">✕</button>`:''}</div>`}).join(''):'<p class="demo" style="text-align:left">Dia livre.</p>';
 }
 $('layers').addEventListener('click',e=>{const b=e.target.closest('[data-layer]');if(!b)return;const k=b.dataset.layer;ligadas.has(k)?ligadas.delete(k):ligadas.add(k);renderCal()});
-$('cal').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(!b)return;calSel=new Date(+b.dataset.day);if(calSel.getMonth()!==calM&&calSel.getFullYear()===2026)calM=calSel.getMonth();renderCal()});
+$('cal').addEventListener('click',e=>{const b=e.target.closest('[data-day]');if(!b)return;calSel=new Date(+b.dataset.day);if(mesAbs(calSel)>=6)calM=mesAbs(calSel);renderCal()});
 $('cal-prev').addEventListener('click',()=>{if(calM>6){calM--;renderCal()}});
-$('cal-next').addEventListener('click',()=>{if(calM<11){calM++;renderCal()}});
-$('cal-hoje').addEventListener('click',()=>{calM=10;calSel=new Date(HOJE);renderCal()});
+$('cal-next').addEventListener('click',()=>{if(calM<23){calM++;renderCal()}});
+$('cal-hoje').addEventListener('click',()=>{calM=Math.max(6,mesAbs(HOJE));calSel=new Date(HOJE);renderCal()});
 
 /* ---------- FINANCEIRO ---------- */
 /* tabelas 2026 (estimativa) */
@@ -2250,8 +2252,8 @@ function extras(k){
 function recebimentos(){const L=[];
   FONTES.forEach(f=>[10,11].forEach(m=>{const b=f.v[m];if(!b)return;const dt=new Date(2026,m+1,0);L.push({dt,f,tipo:(f.tipo==='Bolsa'?'Bolsa de ':'Pagamento de ')+MESN[m],bruto:b,liq:folha(f.k,b).liq,st:'estimado',q:f.pag&&f.pag!=='—'?f.pag:''})}));
   return L.sort((a,b)=>a.dt-b.dt)}
-const receb=()=>recebimentos().filter(r=>r.dt.getMonth()===10);
-let rcMes=10;
+const MES_REC=HOJE.getFullYear()===2026&&HOJE.getMonth()===11?11:10;const receb=()=>recebimentos().filter(r=>r.dt.getMonth()===MES_REC);
+let rcMes=MES_REC;
 const nomeCurto=f=>f.nome.split(' · ')[0]+(f.k==='unitins-mba'?' · MBA':f.k==='unitins-tog'?' · TO Graduado':'');
 function linhaReceb(r){const kc=r.tipo.startsWith('13')?'k13':r.tipo.startsWith('Férias')?'kfer':r.f.tipo==='Bolsa'?'kbol':'ksal',bol=r.f.tipo==='Bolsa';
   const d=r.dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','').replace(' de ',' ');
@@ -2340,7 +2342,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-imp]');if(
   const m=e.target.closest('[data-manual]');if(m){revisar({k:m.dataset.manual,itens:[]},'')}});
 
 function abrirCC(k){const RR=ultimoReal(k);if(RR){$('sheet-in').innerHTML=ccRealHtml(k,RR);$('sheet').classList.add('on');return}
-  const f=F(k),sal=f.v[10],fo=folha(k,sal),ex=extras(k),pct=v=>sal?((v/sal)*100).toFixed(1).replace('.',',')+'%':'';
+  const f=F(k);if(!f)return;const sal=f.v[10],fo=folha(k,sal),ex=extras(k),pct=v=>sal?((v/sal)*100).toFixed(1).replace('.',',')+'%':'';
   const linhas=CLT[k]?`<tr class="sec"><td colspan="3">Proventos</td></tr><tr><td>${k==='fasec'?'Horas-aula do mês':'Salário base'}</td><td class="ref">30 dias</td><td>${b2(sal)}</td></tr>
     <tr class="sec"><td colspan="3">Descontos</td></tr><tr><td>INSS (tabela 2026)</td><td class="ref">${pct(fo.ins)}</td><td class="neg">− ${b2(fo.ins)}</td></tr><tr><td>Imposto de Renda retido</td><td class="ref">${pct(fo.ir)}</td><td class="neg">− ${b2(fo.ir)}</td></tr>`
    :`<tr class="sec"><td colspan="3">Proventos</td></tr><tr><td>Bolsa mensal</td><td class="ref">1 mês</td><td>${b2(sal)}</td></tr><tr class="sec"><td colspan="3">Descontos</td></tr><tr><td>Sem desconto na fonte informado</td><td class="ref"></td><td>${b2(0)}</td></tr>`;
@@ -2354,7 +2356,7 @@ function abrirCC(k){const RR=ultimoReal(k);if(RR){$('sheet-in').innerHTML=ccReal
   $('sheet-in').insertAdjacentHTML('beforeend',`<button class="impbtn" type="button" data-imp="${k}">📄 Importar o contracheque real em PDF</button>`);
   $('sheet').classList.add('on');$('cc-x').focus();
 }
-document.addEventListener('click',e=>{const c=e.target.closest('[data-cc]');if(c){abrirCC(c.dataset.cc);return}if(e.target.id==='sheet'||e.target.closest('#cc-x'))$('sheet').classList.remove('on')});
+document.addEventListener('click',e=>{const c=e.target.closest('[data-cc]');if(c){if(e.target.closest('[data-del-fonte]'))return;abrirCC(c.dataset.cc);return}if(e.target.id==='sheet'||e.target.closest('#cc-x'))$('sheet').classList.remove('on')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('sheet').classList.remove('on');if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.cc)abrirCC(e.target.dataset.cc)});
 $('rc-mes').addEventListener('click',e=>{const b=e.target.closest('[data-mes]');if(b){rcMes=+b.dataset.mes;renderReceb()}});
 function renderReceb(){$('rc-mes').innerHTML=[[10,'Novembro'],[11,'Dezembro']].map(([m,l])=>`<button type="button" data-mes="${m}" aria-pressed="${m===rcMes}">${l}</button>`).join('');
@@ -2363,8 +2365,8 @@ const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).tri
 function renderFin(){
   const tot=MESES.map((_,i)=>FONTES.reduce((s,x)=>s+x.v[i],0)),dez=tot[11],jan=tot[0];
   const IC={a:'<svg class="ico" viewBox="0 0 32 32"><rect x="5" y="9" width="22" height="16" rx="4" fill="#5b8cff"/><circle cx="16" cy="17" r="4" fill="#fff" opacity=".9"/><rect x="9" y="6" width="14" height="4" rx="2" fill="#9db8ff"/></svg>',b:'<svg class="ico" viewBox="0 0 32 32" fill="none" stroke="#1e9b50" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 23l8-8 5 4 9-10"/><path d="M21 9h6v6"/></svg>',c:'<svg class="ico" viewBox="0 0 32 32"><ellipse cx="16" cy="22" rx="10" ry="4" fill="#e8a317"/><ellipse cx="16" cy="17" rx="10" ry="4" fill="#f5b82e"/><ellipse cx="16" cy="12" rx="10" ry="4" fill="#ffd35c"/></svg>',d:'<svg class="ico" viewBox="0 0 32 32" fill="none" stroke="#3f5ef0" stroke-width="2.6" stroke-linejoin="round"><path d="M16 5l11 6-11 6-11-6z" fill="#cdd7ff"/><path d="M5 16l11 6 11-6M5 21l11 6 11-6"/></svg>'};
-  const liqNov=recebimentos().filter(r=>r.dt.getMonth()===10).reduce((a,r)=>a+r.liq,0);
-  $('fin-tiles').innerHTML=[[IC.a+brl(Math.round(liqNov)),'líquido a receber em novembro','var(--s3)'],[IC.b+(jan?`<span class="up">+${Math.round((dez/jan-1)*100)}%</span>`:'—'),'renda bruta de jan a dez','var(--ok)'],[IC.c+brl(Math.round(tot.slice(0,11).reduce((a,b)=>a+b,0)/11)),'média bruta mensal até nov','var(--accent)'],[IC.d+FONTES.length,'fontes de renda','var(--s6)']]
+  const liqNov=recebimentos().filter(r=>r.dt.getMonth()===MES_REC).reduce((a,r)=>a+r.liq,0);
+  $('fin-tiles').innerHTML=[[IC.a+brl(Math.round(liqNov)),'líquido a receber em '+(MES_REC===11?'dezembro':'novembro'),'var(--s3)'],[IC.b+(jan?`<span class="up">+${Math.round((dez/jan-1)*100)}%</span>`:'—'),'renda bruta de jan a dez','var(--ok)'],[IC.c+brl(Math.round(tot.slice(0,11).reduce((a,b)=>a+b,0)/11)),'média bruta mensal até nov','var(--accent)'],[IC.d+FONTES.length,'fontes de renda','var(--s6)']]
     .map(([n,l,c])=>`<div class="tile glass"><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
   const insT=FONTES.filter(f=>CLT[f.k]).reduce((a,f)=>a+folha(f.k,f.v[10]).ins,0),teto=inss(TETO);
   $('fin-alerta').innerHTML=insT>teto?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg><div><b>INSS acima do teto: cerca de ${brl(Math.round(insT-teto))} por mês a mais</b><span>FAPTO, IFTO e FASEC descontam INSS separadamente (${brl(Math.round(insT))} somados), mas o máximo em 2026 é ${b2(teto)}. A diferença entra no seu pedido de restituição. O IR também é retido separado em cada fonte; no ajuste anual a soma pode gerar imposto a pagar.</span></div>`:'';

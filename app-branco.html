@@ -1560,7 +1560,7 @@ function renderDescanso(){
   const pes=new Set();semanas().forEach(w=>{if(w.au+w.dout>LIMITE)for(let i=0;i<7;i++)pes.add(keyOf(addD(w.ini,i)))});
   $('desc-sem').innerHTML=AULAS.map(t=>{let alvo=null;for(let d=addD(HOJE,1);d<=FIM;d=addD(d,1)){if(aulasDoDia(d).includes(t.id)&&!tagProva(t.id,d)&&!(MODO[keyOf(d)]||{})[t.id]&&!PL[t.id+'|'+keyOf(d)]){if(!alvo)alvo=new Date(d);if(pes.has(keyOf(d))){alvo=new Date(d);break}}}
     const k=alvo?t.id+'|'+keyOf(alvo):'',ja=k&&SEM[k];
-    return `<div class="semi"><span class="bar" style="background:${INST[t.inst]}"></span><div class="t"><b>${t.nome}</b><span>${(SEMINARIOS[t.id]||[]).join(' · ')}</span><span>${alvo?'Data sugerida: '+dShort(alvo)+(pes.has(keyOf(alvo))?' (semana cheia)':''):'Sem aula livre até o fim do semestre'}</span></div>${alvo?(ja?'<span class="st plan">Agendado</span>':`<button class="btn soft" type="button" data-sug-sem="${k}::${SEMINARIOS[t.id][0]}">Agendar</button>`):''}</div>`}).join('');
+    return `<div class="semi"><span class="bar" style="background:${INST[t.inst]}"></span><div class="t"><b>${t.nome}</b><span>${(SEMINARIOS[t.id]||[]).join(' · ')}</span><span>${alvo?'Data sugerida: '+dShort(alvo)+(pes.has(keyOf(alvo))?' (semana cheia)':''):'Sem aula livre até o fim do semestre'}</span></div>${alvo?(ja?'<span class="st plan">Agendado</span>':`<button class="btn soft" type="button" data-sug-sem="${k}::${(SEMINARIOS[t.id]||['Tema livre'])[0]}">Agendar</button>`):''}</div>`}).join('');
   if($('v-descanso').classList.contains('on'))renderLoad();
 }
 function renderRegHoje(){const P=pendentes();$('pend-n').textContent=P.length?`· ${P.length} para confirmar`:'';

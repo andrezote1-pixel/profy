@@ -939,6 +939,29 @@ body.onb-on{overflow:hidden}
 .pushbox button{align-self:flex-start;margin-top:6px;min-height:42px;padding:0 16px;border-radius:12px;font:700 14px var(--font);cursor:pointer}
 .pushbox .pb1{border:0;background:var(--accent-2);color:#fff}
 .pushbox .pb2{border:1px solid var(--stroke);background:var(--soft);color:var(--ink)}
+
+.encsub{margin:4px 0 10px;font-size:13.5px;color:var(--ink-2)}
+.encnum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.encnum label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.encnum input{width:100%;min-width:0;box-sizing:border-box;min-height:44px;border-radius:12px;border:1px solid var(--stroke);background:var(--field);color:var(--ink);font:600 16px var(--font);padding:0 12px}
+.enccount{display:flex;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
+.enccount span{padding:4px 10px;border-radius:99px;background:var(--soft);font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.enccount span.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--done-ink)}
+.encmes{display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px}
+.encmes b{font-size:15px}
+.encal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.encal i{font-style:normal;text-align:center;font-size:11.5px;font-weight:700;color:var(--ink-3);padding:4px 0}
+.encal button{aspect-ratio:1;border:1px solid transparent;border-radius:12px;background:var(--soft);color:var(--ink);font:600 15px var(--font);cursor:pointer;min-height:40px;padding:0}
+.encal button.hoje{border-color:var(--accent)}
+.encal button.sel{background:var(--accent-2);color:#fff}
+.encal button.sel.prova{background:#8a3fd6}
+.enclist{margin:12px 0;display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto}
+.encrow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--soft)}
+.encrow b{width:30px}
+.encrow span{flex:1;font-size:14px;text-transform:capitalize}
+.encrow button{border:1px solid var(--stroke);background:transparent;color:var(--ink-2);border-radius:99px;font:600 12.5px var(--font);padding:6px 10px;cursor:pointer}
+.encrow button.on{background:#8a3fd6;border-color:#8a3fd6;color:#fff}
+.encrow button.x{border:0;padding:6px}
 </style>
 </head>
 <body>
@@ -1190,7 +1213,7 @@ const TABS=['hoje','calendario','chamada','avisos','mais'];
 const INST=new Proxy({IFTO:'#2f9e41',FASEC:'#f68634',UNITINS:'#0e8fa1','UAB/UFT':'#3f5ef0'},{get:(o,k)=>o[k]||(typeof k==='string'?['#5b6ee1','#d9548c','#2b9fb3','#c27a1a','#6f5bd6'][[...k].reduce((a,c)=>a+c.charCodeAt(0),0)%5]:undefined)});
 const HOJE=(()=>{const q=new URLSearchParams(location.search).get('hoje');if(q){const[y,m,d]=q.split('-').map(Number);return new Date(y,m-1,d)}const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())})();
 const ds=(d,m)=>`2026-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-const keyOf=dt=>ds(dt.getDate(),dt.getMonth()+1);
+const keyOf=dt=>dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 const fromKey=k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
 const dLong=dt=>dt.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
 const dShort=dt=>dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
@@ -1264,6 +1287,7 @@ const QUINZ={};
 const PROVAS={};
 const EXT_ON=new Set();
 const MODO={};
+var ENC_M=null;function encMap(){if(!ENC_M){try{ENC_M=JSON.parse(localStorage.getItem('cad-enc')||'{}')||{}}catch(_){ENC_M={}}}return ENC_M}
 const baseAulas=memo(_baseAulas);function _baseAulas(dt){ 
   const w=dt.getDay(),ids=[];
   const inIF=dt>=new Date(2026,6,27)&&dt<=new Date(2026,11,17),inFA=dt>=new Date(2026,7,10)&&dt<=new Date(2026,11,9);
@@ -1271,15 +1295,15 @@ const baseAulas=memo(_baseAulas);function _baseAulas(dt){
   if(inIF&&w===4)ids.push('ifto-ext');
   if(inFA&&w===1)ids.push('fasec-lic');
   if(inFA&&w===3)ids.push('fasec-cp');
-  Object.entries(QUINZ).forEach(([id,arr])=>arr.forEach(([d,m])=>{if(d===dt.getDate()&&m===dt.getMonth()+1)ids.push(id)}));
-  TURMAS.forEach(t=>{const dd=t.dias||(t.dia!=null?[t.dia]:[]);if(!dd.includes(w))return;let a=HOJE,z=new Date(2027,11,31);if(t.dIni){const x=fromKey(t.dIni);if(x>a)a=x}if(t.dFim)z=fromKey(t.dFim);if(dt>=a&&dt<=z)ids.push(t.id)});
+  Object.entries(QUINZ).forEach(([id,arr])=>{if(encMap()[id])return;arr.forEach(([d,m])=>{if(d===dt.getDate()&&m===dt.getMonth()+1)ids.push(id)})});
+  TURMAS.forEach(t=>{const en=encMap()[t.id];if(en){if(en.d.some(e=>e.k===keyOf(dt)))ids.push(t.id);return}const dd=t.dias||(t.dia!=null?[t.dia]:[]);if(!dd.includes(w))return;let a=HOJE,z=new Date(2027,11,31);if(t.dIni){const x=fromKey(t.dIni);if(x>a)a=x}if(t.dFim)z=fromKey(t.dFim);if(dt>=a&&dt<=z)ids.push(t.id)});
   return ids.filter(id=>byId(id));
 }
 const aulasDoDia=memo(_aulasDoDia);function _aulasDoDia(dt){
   const k=keyOf(dt);
   return baseAulas(dt).filter(id=>{const t=byId(id);return !(SEM_AULA[t.inst]||new Set()).has(k)&&!(FERIADOS.some(f=>f.k===k&&(f.esf==='Federal'||f.esf==='Estadual'))&&!(MANTIDA[k]||[]).includes(id))});
 }
-function tagProva(id,dt){const k=keyOf(dt);let tag=(PROVAS[k]||{})[id];(QUINZ[id]||[]).forEach(([d,m,tg])=>{if(tg&&d===dt.getDate()&&m===dt.getMonth()+1)tag=tg});return tag}
+function tagProva(id,dt){const k=keyOf(dt);let tag=(PROVAS[k]||{})[id];const en=encMap()[id];if(en){const e=en.d.find(x=>x.k===k);return (e&&e.tag)||tag}(QUINZ[id]||[]).forEach(([d,m,tg])=>{if(tg&&d===dt.getDate()&&m===dt.getMonth()+1)tag=tg});return tag}
 function modo(id,dt){const k=keyOf(dt),t=byId(id),kk=id+'|'+k;if(MODO_U[kk])return MODO_U[kk];const rg=REG[kk];if(rg&&rg.status==='ead')return 'On-line · EaD';if((MODO[k]||{})[id])return MODO[k][id];if(id==='ifto-ext')return EXT_ON.has(k)?'On-line · entrega no Moodle':'Presencial';if(t&&t.on==='sim')return 'On-line';if(t&&t.on==='hib')return 'Híbrido';return 'Presencial'}
 const feriadosDoDia=memo(_feriadosDoDia);function _feriadosDoDia(dt){
   const k=keyOf(dt),base=baseAulas(dt),out=[];
@@ -1771,11 +1795,40 @@ function form(titulo,campos,onOk){
   $('sheet').classList.add('on');$('f-ok').addEventListener('click',()=>{const v={};campos.forEach(c=>v[c.k]=$('f-'+c.k).value.trim());if(onOk(v)!==false)$('sheet').classList.remove('on')});
   const f=$('f-'+campos[0].k);if(f)f.focus()}
 const DIAS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
-function novaTurma(){form('Nova turma',[{k:'nome',l:'Disciplina',ph:'ex.: Contabilidade Geral'},{k:'inst',l:'Instituição',ph:'ex.: IFTO, UFT, Católica'},{k:'cid',l:'Cidade',ph:'ex.: Palmas'},{k:'dia',l:'Dia da semana',opts:DIAS.slice(1,6)},{k:'ini',l:'Início',type:'time',v:'19:00'},{k:'fim',l:'Fim',type:'time',v:'21:30'}],v=>{
+let encEd=null;
+const MESES_E=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const encOrd=()=>encEd.d.slice().sort((a,b)=>a.k<b.k?-1:1);
+function abrirEnc(id){const t=byId(id);if(!t)return;const o=encMap()[id]||{n:10,p:2,d:[]};const p0=o.d.length?fromKey(o.d.slice().sort((a,b)=>a.k<b.k?-1:1)[0].k):new Date(HOJE);
+  encEd={id,n:o.n,p:o.p,d:o.d.map(x=>({k:x.k,tag:x.tag||''})),mes:new Date(p0.getFullYear(),p0.getMonth(),1)};renderEnc();$('sheet').classList.add('on')}
+function encTags(){encOrd().filter(x=>x.tag).forEach((x,i)=>{x.tag='N'+(i+1)})}
+function renderEnc(){const e=encEd,t=byId(e.id),ano=e.mes.getFullYear(),mm=e.mes.getMonth(),ini=new Date(ano,mm,1).getDay(),nd=new Date(ano,mm+1,0).getDate();
+  const sel=new Set(e.d.map(x=>x.k)),prov=new Set(e.d.filter(x=>x.tag).map(x=>x.k));let cal='';
+  ['D','S','T','Q','Q','S','S'].forEach(x=>{cal+='<i>'+x+'</i>'});for(let i=0;i<ini;i++)cal+='<span></span>';
+  for(let d=1;d<=nd;d++){const k=keyOf(new Date(ano,mm,d));cal+='<button type="button" data-enc-dia="'+k+'" class="'+(sel.has(k)?(prov.has(k)?'sel prova':'sel'):'')+(k===keyOf(HOJE)?' hoje':'')+'">'+d+'</button>'}
+  const ord=encOrd(),np=ord.filter(x=>x.tag).length;
+  const lista=ord.map((x,i)=>'<div class="encrow"><b>'+(i+1)+'º</b><span>'+fromKey(x.k).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'}).replace('.','')+'</span><button type="button" class="'+(x.tag?'on':'')+'" data-enc-prova="'+x.k+'">'+(x.tag?'Prova '+x.tag:'Marcar prova')+'</button><button type="button" class="x" data-enc-dia="'+x.k+'" aria-label="Tirar esta data">✕</button></div>').join('');
+  $('sheet-in').innerHTML='<div class="grab"></div><button class="round close" type="button" id="cc-x" aria-label="Fechar">✕</button><h3>'+t.nome+'</h3>'+
+    '<p class="encsub">Toque nos dias do calendário para marcar os encontros. Toque de novo para tirar.</p>'+
+    '<div class="encnum"><label>Encontros<input type="number" inputmode="numeric" min="1" id="enc-n" value="'+e.n+'"></label><label>Provas<input type="number" inputmode="numeric" min="0" id="enc-p" value="'+e.p+'"></label></div>'+
+    '<div class="enccount"><span class="'+(ord.length===+e.n?'ok':'')+'">'+ord.length+' de '+e.n+' datas</span><span class="'+(np===+e.p?'ok':'')+'">'+np+' de '+e.p+' provas</span></div>'+
+    '<div class="encmes"><button type="button" class="round" data-enc-mes="-1" aria-label="Mês anterior">‹</button><b>'+MESES_E[mm].charAt(0).toUpperCase()+MESES_E[mm].slice(1)+' de '+ano+'</b><button type="button" class="round" data-enc-mes="1" aria-label="Próximo mês">›</button></div>'+
+    '<div class="encal">'+cal+'</div><div class="enclist">'+(lista||'<p class="encsub">Nenhuma data marcada ainda.</p>')+'</div>'+
+    '<button class="btn" type="button" id="enc-ok" style="justify-content:center;width:100%">Salvar encontros</button>'}
+document.addEventListener('click',ev=>{
+  const a=ev.target.closest('[data-enc]');if(a){abrirEnc(a.dataset.enc);return}
+  if(!encEd)return;if(ev.target.closest('#cc-x')||ev.target.id==='sheet'){encEd=null;return}
+  if(!ev.target.closest('#sheet-in'))return;
+  const d=ev.target.closest('[data-enc-dia]');if(d){const k=d.dataset.encDia,i=encEd.d.findIndex(x=>x.k===k);if(i>=0)encEd.d.splice(i,1);else{if(encEd.d.length>=+encEd.n){toast('Já marcou os '+encEd.n+' encontros. Aumente o número ou tire uma data.');return}encEd.d.push({k,tag:''})}encTags();renderEnc();return}
+  const p=ev.target.closest('[data-enc-prova]');if(p){const x=encEd.d.find(y=>y.k===p.dataset.encProva);if(x){if(!x.tag&&encEd.d.filter(y=>y.tag).length>=+encEd.p){toast('Já marcou as '+encEd.p+' provas. Aumente o número de provas se precisar.');return}x.tag=x.tag?'':'P'}encTags();renderEnc();return}
+  const m=ev.target.closest('[data-enc-mes]');if(m){encEd.mes=new Date(encEd.mes.getFullYear(),encEd.mes.getMonth()+Number(m.dataset.encMes),1);renderEnc();return}
+  if(ev.target.closest('#enc-ok')){const mp=encMap();mp[encEd.id]={n:+encEd.n||encEd.d.length,p:+encEd.p||0,d:encOrd()};store.set('cad-enc',mp);VER++;$('sheet').classList.remove('on');encEd=null;try{renderTurmas();renderCal();renderHoje()}catch(_){}try{syncAgenda(true)}catch(_){}toast('Encontros salvos');return}
+});
+document.addEventListener('change',ev=>{if(!encEd||(ev.target.id!=='enc-n'&&ev.target.id!=='enc-p'))return;if(ev.target.id==='enc-n')encEd.n=Math.max(1,+ev.target.value||1);else encEd.p=Math.max(0,+ev.target.value||0);renderEnc()});
+function novaTurma(){form('Nova turma',[{k:'nome',l:'Disciplina',ph:'ex.: Contabilidade Geral'},{k:'inst',l:'Instituição',ph:'ex.: IFTO, UFT, Católica'},{k:'cid',l:'Cidade',ph:'ex.: Palmas'},{k:'freq',l:'Como são as aulas',opts:['Toda semana, no mesmo dia','Por encontros, em datas que eu escolho']},{k:'dia',l:'Dia da semana (se for toda semana)',opts:DIAS.slice(1,7)},{k:'nenc',l:'Quantos encontros (se for por encontros)',type:'number',v:'10'},{k:'nprov',l:'Quantos são de prova',type:'number',v:'2'},{k:'ini',l:'Início',type:'time',v:'19:00'},{k:'fim',l:'Fim',type:'time',v:'21:30'}],v=>{
   if(!v.nome){toast('Escreva o nome da disciplina');return false}
   const id='u-'+Date.now(),h=x=>x.replace(':','h'),cid=v.cid||'—';if(!v.inst){toast('Escreva a instituição');return false}
-  const t={id,inst:v.inst,nome:v.nome,sub:'Turma nova',hor:`${v.dia.slice(0,3)} ${h(v.ini)}–${h(v.fim)}`,ini:h(v.ini),fim:h(v.fim),local:v.inst+' · '+cid,cidade:cid,n:+v.n||0,dia:DIAS.indexOf(v.dia)};
-  U.turmas.push(t);salvaU();aplicaUsuario();fillSelects();renderTurmas();renderCal();renderHoje();toast('Turma adicionada')})}
+  const enc=v.freq.startsWith('Por encontros');const t={id,inst:v.inst,nome:v.nome,sub:'Turma nova',hor:`${enc?'Encontros':v.dia.slice(0,3)} ${h(v.ini)}–${h(v.fim)}`,ini:h(v.ini),fim:h(v.fim),local:v.inst+' · '+cid,cidade:cid,n:+v.n||0,dia:enc?null:DIAS.indexOf(v.dia)};if(enc){const mp=encMap();mp[id]={n:Math.max(1,+v.nenc||10),p:Math.max(0,+v.nprov||0),d:[]};store.set('cad-enc',mp)}
+  U.turmas.push(t);salvaU();aplicaUsuario();fillSelects();renderTurmas();renderCal();renderHoje();toast('Turma adicionada');if(enc)setTimeout(()=>abrirEnc(id),350)})}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-bv]');if(!b)return;const k=b.dataset.bv;if(k==='turma'){go('turmas');setTimeout(novaTurma,250)}else if(k==='fonte'){go('financeiro');setTimeout(novaFonte,250)}else abrirFoto()});
 function novaFonte(){form('Nova fonte de renda',[{k:'nome',l:'Instituição e programa',ph:'ex.: UNITINS · TO Graduado'},{k:'funcao',l:'Função',ph:'ex.: Coordenador de Disciplina'},{k:'tipo',l:'Tipo',opts:['Bolsa','CLT','Contrato temporário','Horista','Prestação de serviço']},{k:'valor',l:'Valor bruto mensal (R$)',type:'number',ph:'1500'},{k:'pag',l:'Quando paga',ph:'ex.: dia 10 do mês seguinte'}],v=>{
   if(!v.nome||!v.valor){toast('Preencha a instituição e o valor');return false}
@@ -1928,11 +1981,11 @@ function renderTurmas(){
       <div class="acts"><button class="btn" type="button" data-rel="${t.id}">Relatório</button><button class="btn soft" type="button" data-alunos="${t.id}">Alunos</button></div></article>`;
     const _al=alunos(t),fq=_al.length?Math.round(_al.reduce((s,x)=>s+x.freq,0)/_al.length):0;
     return `<article class="tcard glass">${del}
-      <div class="top"><div><div class="idrow">${logoIc(t.inst,30)}<span class="inst" style="background:${cor}">${t.inst}</span></div><h3>${t.nome}</h3><div class="meta">${t.hor} · ${t.cidade}${salaTxt(t.id)?' · '+salaTxt(t.id):''}</div></div><div class="ringw">${ring(fq,fq<80?'#e8930c':cor)}<small>freq. média</small></div></div>
+      <div class="top"><div><div class="idrow">${logoIc(t.inst,30)}<span class="inst" style="background:${cor}">${t.inst}</span></div><h3>${t.nome}</h3><div class="meta">${encMap()[t.id]?encMap()[t.id].d.length+' de '+encMap()[t.id].n+' encontros · '+t.ini:t.hor} · ${t.cidade}${salaTxt(t.id)?' · '+salaTxt(t.id):''}</div></div><div class="ringw">${ring(fq,fq<80?'#e8930c':cor)}<small>freq. média</small></div></div>
       <div class="badges">${onBdg(t)}</div>${onl}
-      <div class="stats"><div><b>${t.n}</b>alunos</div><div><b>${t.dadas}/${t.total}</b>aulas dadas</div><div><b>${fonte?fonte.tipo:''}</b>vínculo</div></div>
+      <div class="stats"><div><b>${t.n}</b>alunos</div><div><b>${t.dadas}/${encMap()[t.id]?encMap()[t.id].n:t.total}</b>aulas dadas</div><div><b>${fonte?fonte.tipo:''}</b>vínculo</div></div>
       <div class="prog"><i style="width:${Math.round(t.dadas/t.total*100)}%;background:${cor}"></i></div>
-      <div class="acts"><button class="btn" type="button" data-alunos="${t.id}">Alunos</button><button class="btn soft" type="button" data-notas="${t.id}">Notas</button></div></article>`}).join('')+'<button class="addcard ed-only" type="button" data-nova-turma>+ Nova turma</button>';
+      <div class="acts"><button class="btn" type="button" data-alunos="${t.id}">Alunos</button><button class="btn soft" type="button" data-notas="${t.id}">Notas</button>${encMap()[t.id]?`<button class="btn soft" type="button" data-enc="${t.id}">Encontros</button>`:''}</div></article>`}).join('')+'<button class="addcard ed-only" type="button" data-nova-turma>+ Nova turma</button>';
 }
 $('filtro').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b){filtro=b.dataset.f;renderTurmas()}});
 
@@ -2377,9 +2430,9 @@ function obAplicaInsts(){ONB.insts.forEach(i=>{obRegInst(i);obFonte(i)});salvaU(
 function obTurmaApp(t){
   const ab=t.dias.map(d=>(OB_DIAS.find(x=>x[0]===d)||[0,''])[1]).join(', '),h=x=>String(x||'').replace(':','h');
   const inst=ONB.insts.find(x=>x.nome===t.inst)||{};
-  return {id:t.id,inst:t.inst,nome:t.nome,sub:t.curso||(t.nivel+(t.nsub?' · '+t.nsub:'')),hor:`${ab} ${h(t.ini)}–${h(t.fim)}`,ini:h(t.ini),fim:h(t.fim),local:t.inst+(inst.cidade?' · '+inst.cidade:''),cidade:inst.cidade||'—',n:(t.alunos||[]).length,dia:t.dias[0],dias:t.dias.slice(),dIni:t.dIni||'',dFim:t.dFim||'',on:t.modal==='On-line'?'sim':t.modal==='Híbrido'?'hib':'nao',nivel:t.nivel,nsub:t.nsub||''};
+  return {id:t.id,inst:t.inst,nome:t.nome,sub:t.curso||(t.nivel+(t.nsub?' · '+t.nsub:'')),hor:`${t.freq==='enc'?'Encontros':ab} ${h(t.ini)}–${h(t.fim)}`,ini:h(t.ini),fim:h(t.fim),local:t.inst+(inst.cidade?' · '+inst.cidade:''),cidade:inst.cidade||'—',n:(t.alunos||[]).length,dia:t.freq==='enc'?null:t.dias[0],dias:t.freq==='enc'?[]:t.dias.slice(),dIni:t.dIni||'',dFim:t.dFim||'',on:t.modal==='On-line'?'sim':t.modal==='Híbrido'?'hib':'nao',nivel:t.nivel,nsub:t.nsub||''};
 }
-function obAplicaTurma(t){const a=obTurmaApp(t);U.turmas=U.turmas.filter(x=>x.id!==a.id);U.turmas.push(a);if((t.alunos||[]).length)U.alAdd[a.id]=t.alunos.slice();salvaU();aplicaUsuario();const tt=byId(a.id);if(tt)Object.assign(tt,a);try{fillSelects()}catch(_){}}
+function obAplicaTurma(t){const a=obTurmaApp(t);U.turmas=U.turmas.filter(x=>x.id!==a.id);U.turmas.push(a);if((t.alunos||[]).length)U.alAdd[a.id]=t.alunos.slice();salvaU();aplicaUsuario();const tt=byId(a.id);if(tt)Object.assign(tt,a);if(t.freq==='enc'){const mp=encMap(),o=mp[a.id]||{d:[]};mp[a.id]={n:Math.max(1,+t.nenc||10),p:Math.max(0,t.nprov==null||t.nprov===''?2:+t.nprov),d:o.d||[]};store.set('cad-enc',mp);VER++}else if(encMap()[a.id]){delete encMap()[a.id];store.set('cad-enc',encMap());VER++}try{fillSelects()}catch(_){}}
 
 function obLogo(i,cb){
   const s=String(i.site||'').trim().replace(/^https?:\W+/i,'').replace(/[\\/].*$/,'');if(!s){cb(null);return}
@@ -2447,16 +2500,17 @@ function obRender(){
     if(!obTurma)obTurma=ONB.turmas.length?null:{id:'u-'+Date.now(),inst:(ONB.insts[0]||{}).nome||'',nivel:'Graduação',nsub:'Bacharelado',dias:[],ini:'19:00',fim:'22:00',modal:'Presencial'};
     const t=obTurma,niv=t?(OB_NIV.find(n=>n[0]===t.nivel)||OB_NIV[4]):null;
     h=obTop(4)+`<h2>Suas turmas</h2><p class="ob-sub">Comece por uma. Notas e o resto você completa depois, no app.</p>
-      ${ONB.turmas.filter(x=>!t||x.id!==t.id).map(x=>`<div class="ob-card ob-row"><span class="ob-bar" style="background:${INST[x.inst]}"></span><div><b>${obEsc(x.nome)}</b><small>${obEsc(x.inst)} · ${x.dias.map(d=>(OB_DIAS.find(y=>y[0]===d)||[0,''])[1]).join(' e ')} · ${obEsc(String(x.ini).replace(':','h'))}</small></div><button type="button" data-ob-edt="${x.id}">Editar</button></div>`).join('')}
+      ${ONB.turmas.filter(x=>!t||x.id!==t.id).map(x=>`<div class="ob-card ob-row"><span class="ob-bar" style="background:${INST[x.inst]}"></span><div><b>${obEsc(x.nome)}</b><small>${obEsc(x.inst)} · ${x.freq==='enc'?(x.nenc||10)+' encontros':x.dias.map(d=>(OB_DIAS.find(y=>y[0]===d)||[0,''])[1]).join(' e ')} · ${obEsc(String(x.ini).replace(':','h'))}</small></div><button type="button" data-ob-edt="${x.id}">Editar</button></div>`).join('')}
       ${t?`<div class="ob-card ob-form">
         <label><span class="ob-lbl">Disciplina</span><input class="ob-in" data-obt="nome" value="${obEsc(t.nome)}" placeholder="ex.: Introdução à Administração"></label>
         <div><span class="ob-lbl">Instituição</span>${ONB.insts.length?`<div class="ob-pills">${ONB.insts.map(i=>`<button type="button" aria-pressed="${t.inst===i.nome}" data-ob-set="turma.inst" data-v="${obEsc(i.nome)}">${obEsc(i.nome)}</button>`).join('')}</div>`:`<input class="ob-in" data-obt="inst" value="${obEsc(t.inst)}" placeholder="ex.: IFTO">`}</div>
         <label><span class="ob-lbl">Curso e turma</span><input class="ob-in" data-obt="curso" value="${obEsc(t.curso)}" placeholder="ex.: ADM · 1º período"></label>
         <div><span class="ob-lbl">Nível de ensino</span>${obDrop('nivel','Nível de ensino',t.nivel,OB_NIV.map(n=>n[0]))}
           ${niv[1].length?`<div class="ob-seg" style="margin-top:10px;grid-template-columns:repeat(${niv[1].length},minmax(0,1fr))">${niv[1].map(s=>`<button type="button" aria-pressed="${t.nsub===s}" data-ob-set="turma.nsub" data-v="${s}">${s}</button>`).join('')}</div>`:''}</div>
-        <div><span class="ob-lbl">Dias da semana</span><div class="ob-pills g6">${OB_DIAS.map(([d,n])=>`<button type="button" aria-pressed="${t.dias.includes(d)}" data-ob-dia="${d}">${n}</button>`).join('')}</div></div>
+        <div><span class="ob-lbl">Como são as aulas</span><div class="ob-seg"><button type="button" aria-pressed="${t.freq!=='enc'}" data-ob-set="turma.freq" data-v="sem">Toda semana</button><button type="button" aria-pressed="${t.freq==='enc'}" data-ob-set="turma.freq" data-v="enc">Por encontros</button></div></div>
+        ${t.freq==='enc'?`<div class="ob-2"><label><span class="ob-lbl">Quantos encontros</span><input class="ob-in" type="number" inputmode="numeric" data-obt="nenc" value="${obEsc(t.nenc||'10')}"></label><label><span class="ob-lbl">Quantos são de prova</span><input class="ob-in" type="number" inputmode="numeric" data-obt="nprov" value="${obEsc(t.nprov||'2')}"></label></div><p class="ob-hint" style="margin-top:-6px">As datas você escolhe depois, num calendário: em Turmas, toque em “Encontros”.</p>`:`<div><span class="ob-lbl">Dias da semana</span><div class="ob-pills g6">${OB_DIAS.map(([d,n])=>`<button type="button" aria-pressed="${t.dias.includes(d)}" data-ob-dia="${d}">${n}</button>`).join('')}</div></div>`}
         <div class="ob-2"><label><span class="ob-lbl">Começa</span><input class="ob-in" type="time" data-obt="ini" value="${obEsc(t.ini)}"></label><label><span class="ob-lbl">Termina</span><input class="ob-in" type="time" data-obt="fim" value="${obEsc(t.fim)}"></label></div>
-        <div class="ob-2"><label><span class="ob-lbl">Primeira aula</span><input class="ob-in" type="date" data-obt="dIni" value="${obEsc(t.dIni)}"></label><label><span class="ob-lbl">Última aula</span><input class="ob-in" type="date" data-obt="dFim" value="${obEsc(t.dFim)}"></label></div>
+        ${t.freq==='enc'?'':`<div class="ob-2"><label><span class="ob-lbl">Primeira aula</span><input class="ob-in" type="date" data-obt="dIni" value="${obEsc(t.dIni)}"></label><label><span class="ob-lbl">Última aula</span><input class="ob-in" type="date" data-obt="dFim" value="${obEsc(t.dFim)}"></label></div>`}
         <div><span class="ob-lbl">Modalidade</span><div class="ob-seg" style="grid-template-columns:repeat(3,minmax(0,1fr))">${['Presencial','On-line','Híbrido'].map(m=>`<button type="button" aria-pressed="${t.modal===m}" data-ob-set="turma.modal" data-v="${m}">${m}</button>`).join('')}</div></div>
         <label><span class="ob-lbl">Alunos (opcional)</span><textarea class="ob-in ob-ta" data-obt="alunosTxt" placeholder="Cole os nomes, um por linha">${obEsc(t.alunosTxt||(t.alunos||[]).join('\n'))}</textarea></label>
         <button type="button" class="ob-btn3" data-ob="salvaturma">Salvar turma</button>
@@ -2489,7 +2543,7 @@ function obSalvaTurma(){
   const t=obTurma;if(!t)return true;
   if(!t.nome||!t.nome.trim()){toast('Escreva o nome da disciplina');return false}
   if(!t.inst){toast('Escolha a instituição');return false}
-  if(!t.dias.length){toast('Marque pelo menos um dia da semana');return false}
+  if(t.freq!=='enc'&&!t.dias.length){toast('Marque pelo menos um dia da semana');return false}
   t.nome=t.nome.trim();t.alunos=String(t.alunosTxt||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const c=Object.assign({},t);delete c.alunosTxt;const i=ONB.turmas.findIndex(x=>x.id===t.id);if(i>=0)ONB.turmas[i]=c;else ONB.turmas.push(c);
   onbSalva();obAplicaTurma(c);obTurma=null;return true;

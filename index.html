@@ -234,8 +234,33 @@ function auth(silencioso){
 }
 $('entrar').onclick=function(){try{localStorage.removeItem('profy-modo')}catch(e){}auth(false)};
 
+function profyHash(t){var x=0;for(var i=0;i<t.length;i++){x=(x*31+t.charCodeAt(i))|0}return x+':'+t.length}
+function PROFY_ATUALIZA(){
+  var hs=function(t){var x=0;for(var i=0;i<t.length;i++){x=(x*31+t.charCodeAt(i))|0}return x+':'+t.length};
+  var ult=0,feito=false;
+  var aviso=function(){
+    if(document.getElementById('profy-nova'))return;
+    var b=document.createElement('button');b.id='profy-nova';b.type='button';
+    b.textContent='Nova versão do Profy · toque para atualizar';
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:2147483647;background:#2563eb;color:#fff;border:0;border-radius:999px;padding:12px 20px;font:600 14px system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:92vw';
+    b.onclick=function(){location.reload()};
+    (document.body||document.documentElement).appendChild(b);
+  };
+  var checar=function(){
+    if(feito||Date.now()-ult<600000)return;ult=Date.now();
+    var exib='';try{exib=sessionStorage.getItem('profy-exibido')||''}catch(e){}
+    var email=false;try{email=JSON.parse(localStorage.getItem('profy-modo')||'null')==='email'}catch(e){}
+    var p=email
+      ?fetch('app-branco.html?v='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(h){try{localStorage.setItem('profy-html-email',h)}catch(e){}return h})
+      :(window.PROFY_CHAMAR?window.PROFY_CHAMAR('pagina',[]):Promise.reject(0)).then(function(r){try{localStorage.setItem('profy-email',JSON.stringify(r.email||''));localStorage.setItem('profy-html:'+(r.email||''),r.html)}catch(e){}return r.html});
+    p.then(function(h){if(h&&exib&&hs(h)!==exib){feito=true;aviso()}},function(){});
+  };
+  setTimeout(checar,2500);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')setTimeout(checar,800)});
+}
 function escrever(html,ponteFn){
-  var ponte='<script>('+(ponteFn||PROFY_PONTE).toString()+')();('+PROFY_PUSH.toString()+')();<\/script>';
+  try{sessionStorage.setItem('profy-exibido',profyHash(html))}catch(e){}
+  var ponte='<script>('+(ponteFn||PROFY_PONTE).toString()+')();('+PROFY_PUSH.toString()+')();('+PROFY_ATUALIZA.toString()+')();<\/script>';
   html=/<head[^>]*>/i.test(html)?html.replace(/<head[^>]*>/i,function(h){return h+ponte}):ponte+html;
   var ir=function(){setTimeout(function(){document.open();document.write(html);document.close()},0)};
   if(document.readyState==='complete')ir();else window.addEventListener('load',ir);

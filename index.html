@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Profy</title>
+<meta name="apple-mobile-web-app-title" content="Profy">
+<meta name="theme-color" content="#0b1530">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;background:radial-gradient(circle at 30% 20%,#1d3d8f,#0b1530 60%);color:#eef3ff;font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}
+.box{max-width:380px}
+img{width:112px;height:112px;border-radius:26px;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+h1{font-size:30px;margin-top:18px}
+.sub{opacity:.7;margin-top:2px}
+.passos{margin-top:26px;padding:18px;border-radius:18px;background:rgba(255,255,255,.08);text-align:left}
+.passos p{margin:6px 0}
+a.btn{display:block;margin-top:22px;padding:15px;border-radius:14px;background:#2f7bff;color:#fff;font-weight:700;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="box">
+<img src="apple-touch-icon.png" alt="">
+<h1>Profy</h1>
+<p class="sub">Sala de aula no bolso</p>
+<div class="passos" id="passos">
+<p><b>Para instalar no iPhone ou iPad:</b></p>
+<p>1. Toque em <b>Compartilhar</b> (quadrado com a seta) no Safari.</p>
+<p>2. Toque em <b>Adicionar à Tela de Início</b>.</p>
+<p>3. Toque em <b>Adicionar</b>.</p>
+</div>
+<a class="btn" id="abrir" href="#">Abrir o Profy</a>
+</div>
+<script>
+var APP='https:/'+'/script.google.com/macros/s/AKfycbyh-Z41JBxGhop3fw4DxYqJksGkgqvVHRGD1sYyXi0os4CM9-2ZxLnNELzEeUo8sFk_yg/exec';
+document.getElementById('abrir').href=APP;
+var q=location.search;
+if(/abrir=1/.test(q)||window.navigator.standalone){location.replace(APP);}
+else{try{history.replaceState(null,'',location.pathname+'?abrir=1');}catch(e){}}
+</script>
+</body>
+</html>

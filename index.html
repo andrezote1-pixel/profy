@@ -111,7 +111,8 @@ $('entrar').onclick=function(){auth(false)};
 function escrever(html){
   var ponte='<script>('+PROFY_PONTE.toString()+')();<\/script>';
   html=/<head[^>]*>/i.test(html)?html.replace(/<head[^>]*>/i,function(h){return h+ponte}):ponte+html;
-  document.open();document.write(html);document.close();
+  var ir=function(){setTimeout(function(){document.open();document.write(html);document.close()},0)};
+  if(document.readyState==='complete')ir();else window.addEventListener('load',ir);
 }
 
 function perfilGoogle(){

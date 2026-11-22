@@ -1179,6 +1179,8 @@ body.onb-on{overflow:hidden}
         <div class="sw2" style="cursor:pointer" onclick="window.abrirCadastro&&abrirCadastro()"><div class="t"><b>Cadastro inicial</b><span>Rever perfil, formação, vínculos e turmas</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
         <div class="sw2" style="cursor:pointer" onclick="window.PROFY_SAIR&&PROFY_SAIR()"><div class="t"><b>Sair da conta</b><span>Seus dados continuam guardados na nuvem</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
       </div>
+      <div class="sw2"><div class="t"><b>Aparelhos conectados</b><span>Onde a sua conta foi aberta e quando foi o último acesso</span></div></div>
+        <div id="disp-lista"></div>
       <p class="credito">Profy · Desenvolvido por André Gonzaga Aires</p>
 
     </section>
@@ -1391,7 +1393,7 @@ function buildNav(){
   $('mais-menu').innerHTML=['turmas','notas','financeiro','lancar','descanso'].map(k=>`<a href="#${k}"><span class="ic" style="background:${cor[k]}">${ICON[k]}</span><span>${LABEL[k]}<small>${sub[k]}</small></span><span class="go">›</span></a>`).join('');
 }
 const PAI={aula:'calendario',alunos:'turmas'};
-const RENDER={avisos:()=>renderAvisos(),hoje:()=>renderHoje(),turmas:()=>renderTurmas(),chamada:()=>renderChamada(),notas:()=>renderNotas(),lancar:()=>renderLancar(),calendario:()=>renderCal(),descanso:()=>renderDescanso(),alunos:()=>renderAlunos(),mais:()=>{}};
+const RENDER={avisos:()=>renderAvisos(),hoje:()=>renderHoje(),turmas:()=>renderTurmas(),chamada:()=>renderChamada(),notas:()=>renderNotas(),lancar:()=>renderLancar(),calendario:()=>renderCal(),descanso:()=>renderDescanso(),alunos:()=>renderAlunos(),mais:()=>renderDisp()};
 function show(){
   let k=(location.hash||'#hoje').slice(1);if(!LABEL[k])k='hoje';
   if(k==='aula'&&!selAula){k='calendario'}
@@ -1415,6 +1417,25 @@ document.addEventListener('click',e=>{
   const r=e.target.closest('[data-rel]');if(r){portal='Tutoria';const p=PEND.find(p=>p.turma===r.dataset.rel);selPend=p?p.id:null;renderLancar();go('lancar')}
 });
 window.addEventListener('hashchange',show);
+function dispId(){let d='';try{d=localStorage.getItem('profy-aparelho')||''}catch(_){}if(!d){d=Date.now().toString(36)+Math.random().toString(36).slice(2,8);try{localStorage.setItem('profy-aparelho',d)}catch(_){}}return d}
+function dispNome(){const u=navigator.userAgent||'',tem=x=>u.indexOf(x)>=0,ipad=tem('iPad')||(tem('Macintosh')&&navigator.maxTouchPoints>1);
+  const so=tem('iPhone')?'iPhone':ipad?'iPad':tem('Android')?'Android':tem('Windows')?'Windows':tem('Macintosh')?'Mac':tem('CrOS')?'Chromebook':tem('Linux')?'Linux':'Aparelho';
+  const nav=tem('Edg')?'Edge':tem('OPR')?'Opera':tem('SamsungBrowser')?'Samsung Internet':tem('Firefox')||tem('FxiOS')?'Firefox':tem('Chrome')||tem('CriOS')?'Chrome':tem('Safari')?'Safari':'navegador';
+  let inst=false;try{inst=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(_){}
+  return so+' · '+(inst?'app instalado':nav)}
+function dispLer(){const d=store.get('cad-disp',{});return d&&typeof d==='object'&&!Array.isArray(d)?d:{}}
+function dispSair(){try{Object.keys(localStorage).forEach(k=>{if(k.indexOf('cad-')===0||k.charAt(0)==='_'||k.indexOf('profy-html')===0||k==='profy-pend'||k==='profy-pend-fb')localStorage.removeItem(k)})}catch(_){}
+  if(window.PROFY_SAIR)PROFY_SAIR();else location.href=location.origin+'/profy/?sair=1'}
+function dispRegistra(){const D=dispLer(),id=dispId(),ag=Date.now(),eu=D[id];
+  if(eu&&eu.x){delete D[id];store.set('cad-disp',D);toast('Este aparelho foi desconectado da conta');setTimeout(dispSair,2200);return}
+  Object.keys(D).forEach(k=>{if(!D[k]||ag-(D[k].u||0)>120*864e5)delete D[k]});
+  D[id]={n:dispNome(),p:eu&&eu.p||ag,u:ag};store.set('cad-disp',D);renderDisp()}
+function dispQuando(ts){const d=new Date(ts),h=String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0'),z=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime(),df=Math.round((z(new Date())-z(d))/864e5);
+  return (df===0?'hoje':df===1?'ontem':String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+(d.getFullYear()!==new Date().getFullYear()?'/'+d.getFullYear():''))+' às '+h}
+function renderDisp(){const el=$('disp-lista');if(!el)return;const D=dispLer(),id=dispId(),lim=x=>String(x||'Aparelho').replace(/[<>&"']/g,''),L=Object.keys(D).filter(k=>D[k]).map(k=>Object.assign({id:k},D[k])).sort((a,b)=>(b.id===id)-(a.id===id)||(b.u||0)-(a.u||0));
+  el.innerHTML=L.map(x=>`<div class="sw2"><div class="t"><b>${lim(x.n)}${x.id===id?' · este aparelho':''}</b><span>${x.x?'Vai sair da conta na próxima vez que abrir o Profy':'Último acesso: '+dispQuando(x.u||x.p||Date.now())}</span></div>${x.id===id||x.x?'':`<button class="btn soft" type="button" data-disp-x="${lim(x.id)}" style="flex:none;padding:8px 12px;font-size:13px">Desconectar</button>`}</div>`).join('')||'<div class="sw2"><div class="t"><span>Nenhum aparelho registrado ainda.</span></div></div>'}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-disp-x]');if(!b)return;const D=dispLer(),k=b.dataset.dispX;if(!D[k])return;D[k].x=1;store.set('cad-disp',D);renderDisp();toast('Esse aparelho sai da conta na próxima vez que abrir o Profy')});
+window.PROFY_DISP=()=>{const eu=dispLer()[dispId()];if(eu&&eu.x){dispRegistra();return}renderDisp()};
 let toastT;function toast(msg){const t=$('toast');t.querySelector('span').textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
 const modoBdg=m=>m.startsWith('On-line')?`<span class="bdg on">${ICON.wifi}${m}</span>`:`<span class="bdg">${ICON.pin}${m}</span>`;
 const onBdg=t=>t.on==='sim'?`<span class="bdg on">${ICON.wifi}On-line</span>`:t.on==='hib'?`<span class="bdg hib">${ICON.wifi}Híbrida</span>`:t.on==='parcial'?`<span class="bdg">${ICON.pin}Presencial · on-line possível</span>`:`<span class="bdg">${ICON.pin}Presencial</span>`;
@@ -2615,7 +2636,7 @@ function obInicial(){
 }
 window.abrirCadastro=()=>{ONB.done=false;if(ONB.passo<1)ONB.passo=1;onbSalva();obAbre()};
 
-aplicaUsuario();aplicaReal();buildNav();aplicaTema();aplicaFoto();aplicaPerfil();renderDescanso();renderLancar();renderCal();badge();show();setTimeout(()=>syncAgenda(),4000);
+aplicaUsuario();aplicaReal();buildNav();aplicaTema();aplicaFoto();aplicaPerfil();renderDescanso();renderLancar();renderCal();badge();show();try{dispRegistra()}catch(_){}setTimeout(()=>syncAgenda(),4000);
 obInicial();
 };
 /* ---------- inicialização: navegador ou Google Apps Script ---------- */
@@ -2634,7 +2655,19 @@ window.PROFY_ERRO=function(e){try{const d=document.createElement('pre');d.textCo
     google.script.run.withSuccessHandler(()=>PROFY_STATUS('Salvo na nuvem às '+hora()))
       .withFailureHandler(()=>{ks.forEach(k=>pend[k]=1);PROFY_STATUS('Sem conexão · salvo no aparelho');clearTimeout(tm);tm=setTimeout(enviar,15000)}).salvarVarios(m)}
   window.PROFY_SYNC=k=>{if(k==='cad-tema')return;pend[k]=1;PROFY_STATUS('Salvando…');clearTimeout(tm);tm=setTimeout(enviar,900)};
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(tm);enviar()}});
+  let oculto=0;
+  function confere(){if(Object.keys(pend).length)return;
+    try{const L=k=>JSON.parse(localStorage.getItem(k)||'null');if(Object.keys(L('profy-pend')||{}).length||Object.keys(L('profy-pend-fb')||{}).length)return;if(L('profy-modo')!=='email'){const tk=L('profy-tok');if(!(tk&&tk.exp>Date.now()+30000))return}}catch(_){return}
+    google.script.run.withSuccessHandler(r=>{if(Object.keys(pend).length)return;const d=(r&&r.dados)||{},ig=(a,b)=>{if(a===b)return true;try{return JSON.stringify(JSON.parse(a))===JSON.stringify(JSON.parse(b))}catch(_){return false}};let mudou=false,disp=false;
+      Object.keys(d).forEach(k=>{if(d[k]==null||k.indexOf('cad-')!==0||k==='cad-tema')return;if(ig(d[k],localStorage.getItem(k)))return;if(k==='cad-disp'||k.indexOf('cad-ag-')===0||k==='cad-avisos-visto'){if(k==='cad-disp')disp=true;try{localStorage.setItem(k,d[k])}catch(_){}return}mudou=true});
+      if(disp&&window.PROFY_DISP){try{PROFY_DISP()}catch(_){}}
+      if(!mudou)return;
+      const sh=document.getElementById('sheet');if(sh&&sh.classList.contains('on'))return;
+      let ult=0;try{ult=+sessionStorage.getItem('profy-refresco')||0}catch(_){}
+      if(Date.now()-ult<300000)return;
+      try{sessionStorage.setItem('profy-refresco',String(Date.now()))}catch(_){}
+      Object.keys(d).forEach(k=>{try{if(d[k]!=null&&k!=='cad-tema')localStorage.setItem(k,d[k])}catch(_){}});location.reload()}).withFailureHandler(()=>{}).carregar()}
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){oculto=Date.now();clearTimeout(tm);enviar();return}if(oculto&&Date.now()-oculto>(window.PROFY_ESPERA==null?60000:window.PROFY_ESPERA)){oculto=0;confere()}});
   google.script.run.withSuccessHandler(r=>{
       try{Object.entries((r&&r.dados)||{}).forEach(([k,v])=>{try{if(v!=null)localStorage.setItem(k,v)}catch(_){}})}catch(_){}
       window.PROFY_AGENDA=r&&r.agenda||null;window.PROFY_NOME=r&&r.nome||'';window.PROFY_PLANILHA=r&&r.planilha||'';

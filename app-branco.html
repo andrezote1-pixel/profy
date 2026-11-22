@@ -1046,7 +1046,7 @@ body.onb-on{overflow:hidden}
 
     <!-- TURMAS -->
     <section class="view" id="v-turmas" aria-labelledby="h-turmas">
-      <div class="head"><div><div class="eyebrow">2º semestre de 2026</div><h1 id="h-turmas">Turmas</h1></div>
+      <div class="head"><div><div class="eyebrow" id="tu-eyebrow">2º semestre de 2026</div><h1 id="h-turmas">Turmas</h1></div>
         <button class="round" type="button" aria-label="Nova turma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></div>
       <div class="seg" id="filtro" role="group" aria-label="Filtrar"></div>
       <div class="grid" id="grid-turmas"></div>
@@ -1054,7 +1054,7 @@ body.onb-on{overflow:hidden}
 
     <!-- CHAMADA -->
     <section class="view" id="v-chamada" aria-labelledby="h-chamada">
-      <div class="head"><div><div class="eyebrow" id="ch-eyebrow">IFTO</div><h1 id="h-chamada">Chamada</h1></div>
+      <div class="head"><div><div class="eyebrow" id="ch-eyebrow"></div><h1 id="h-chamada">Chamada</h1></div>
         <button class="round" type="button" id="todos-p" aria-label="Marcar todos presentes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l5 5L17 7"/><path d="M12 15l2 2 8-8"/></svg></button></div>
       <div class="ctrl">
         <select class="sel" id="ch-turma" aria-label="Turma"></select>
@@ -1072,7 +1072,7 @@ body.onb-on{overflow:hidden}
 
     <!-- NOTAS -->
     <section class="view" id="v-notas" aria-labelledby="h-notas">
-      <div class="head"><div><div class="eyebrow" id="nt-eyebrow">IFTO</div><h1 id="h-notas">Notas</h1></div>
+      <div class="head"><div><div class="eyebrow" id="nt-eyebrow"></div><h1 id="h-notas">Notas</h1></div>
         <button class="round" type="button" aria-label="Lançar estas notas" data-go="lancar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></button></div>
       <select class="sel" id="nt-turma" aria-label="Turma"></select>
       <div class="summary" id="nt-sum"></div>
@@ -1086,7 +1086,7 @@ body.onb-on{overflow:hidden}
 
     <!-- LANÇAR -->
     <section class="view" id="v-lancar" aria-labelledby="h-lancar">
-      <div class="head"><div><div class="eyebrow">Portais e relatórios</div><h1 id="h-lancar">Lançar</h1></div></div>
+      <div class="head"><div><div class="eyebrow">Para o sistema da instituição</div><h1 id="h-lancar">Lançar</h1></div></div>
       <div class="seg" id="portais" role="group" aria-label="Portal"></div>
       <div class="two">
         <div><div class="card glass"><h2 id="lc-titulo">Pendências</h2><div id="lc-lista"></div></div></div>
@@ -1124,8 +1124,8 @@ body.onb-on{overflow:hidden}
     <!-- DESCANSO -->
     <section class="view" id="v-descanso" aria-labelledby="h-desc">
       <div class="head"><div><div class="eyebrow"><span>Carga, EaD e seminários</span></div><h1 id="h-desc">Descanso</h1></div></div>
-      <div class="card glass"><h2>Horas por semana <span style="text-transform:none;letter-spacing:0;font-weight:600">aulas + doutorado</span></h2>
-        <div class="lg"><span><i style="background:var(--accent)"></i>Aulas e provas</span><span><i style="background:var(--s1)"></i>Doutorado</span><span><i style="background:var(--warn);height:2px;border-radius:0"></i>Seu limite: 20h</span></div>
+      <div class="card glass"><h2>Horas por semana <span style="text-transform:none;letter-spacing:0;font-weight:600">aulas e provas</span></h2>
+        <div class="lg"><span><i style="background:var(--accent)"></i>Aulas e provas</span><span><i style="background:var(--warn);height:2px;border-radius:0"></i>Seu limite: 20h</span></div>
         <svg class="chart load" id="load-chart" role="img" aria-label="Horas de trabalho por semana"></svg></div>
       <div class="two">
         <div><div class="card glass"><h2>Sugestões para descansar</h2><div class="sugs" id="desc-lista"></div></div></div>
@@ -1141,7 +1141,7 @@ body.onb-on{overflow:hidden}
       <div class="two">
         <div>
           <div class="card glass">
-            <h2>Evolução mensal <span style="text-transform:none;letter-spacing:0;font-weight:600">2026 · dez previsto</span></h2>
+            <h2>Evolução mensal <span id="fin-ano" style="text-transform:none;letter-spacing:0;font-weight:600">2026 · dez previsto</span></h2>
             <div class="lg" id="fin-lg"></div>
             <div class="chartwrap" id="fin-wrap"><svg class="chart" id="fin-chart" role="img" aria-label="Renda bruta mensal empilhada por fonte"></svg><div class="tip glass" id="fin-tip"></div></div>
           </div>
@@ -1174,8 +1174,8 @@ body.onb-on{overflow:hidden}
         <div class="seg tema temaseg" role="group" aria-label="Tema"></div>
         <div class="sw2"><div class="t"><b>Modo de edição</b><span>Adicionar e remover turmas, alunos, fontes de renda e compromissos</span></div><button class="tog" type="button" data-edit-tg id="tog-edit" aria-label="Modo de edição"></button></div>
         <div class="sw2" style="cursor:pointer" data-open-foto><div class="t"><b>Perfil</b><span>Foto, nome e titulação</span></div><div class="me" style="width:44px;height:44px"><img class="foto" alt=""></div></div>
-        <div class="sw2" style="cursor:pointer" data-open-logos><div class="t"><b>Logos das instituições</b><span>IFTO, FASEC, UNITINS, UAB/UFT e FAPTO</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
-        <div class="sw2" style="cursor:pointer" data-open-notif><div class="t"><b>Avisos</b><span>No celular: aula 24h e 30 min antes, pagamento, prova e doutorado</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
+        <div class="sw2" style="cursor:pointer" data-open-logos><div class="t"><b>Logos das instituições</b><span>As instituições onde você trabalha</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
+        <div class="sw2" style="cursor:pointer" data-open-notif><div class="t"><b>Avisos</b><span>No celular: aula 24h e 30 min antes, pagamento e prova</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
         <div class="sw2" style="cursor:pointer" onclick="window.abrirCadastro&&abrirCadastro()"><div class="t"><b>Cadastro inicial</b><span>Rever perfil, formação, vínculos e turmas</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
         <div class="sw2" style="cursor:pointer" onclick="window.PROFY_SAIR&&PROFY_SAIR()"><div class="t"><b>Sair da conta</b><span>Seus dados continuam guardados na nuvem</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
       </div>
@@ -1212,6 +1212,7 @@ const SIDE=['hoje','calendario','turmas','chamada','notas','lancar','financeiro'
 const TABS=['hoje','calendario','chamada','avisos','mais'];
 const INST=new Proxy({IFTO:'#2f9e41',FASEC:'#f68634',UNITINS:'#0e8fa1','UAB/UFT':'#3f5ef0'},{get:(o,k)=>o[k]||(typeof k==='string'?['#5b6ee1','#d9548c','#2b9fb3','#c27a1a','#6f5bd6'][[...k].reduce((a,c)=>a+c.charCodeAt(0),0)%5]:undefined)});
 const HOJE=(()=>{const q=new URLSearchParams(location.search).get('hoje');if(q){const[y,m,d]=q.split('-').map(Number);return new Date(y,m-1,d)}const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())})();
+const ANO_FIN=HOJE.getFullYear(),MES_FIN=HOJE.getMonth(),ABS_FIN=ANO_FIN*12+MES_FIN;try{$('tu-eyebrow').textContent=(MES_FIN<6?'1º':'2º')+' semestre de '+ANO_FIN}catch(_){}
 const ds=(d,m)=>`2026-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 const keyOf=dt=>dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 const fromKey=k=>{const[y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)};
@@ -1387,7 +1388,7 @@ $('sidemin').addEventListener('click',()=>{const on=document.body.classList.togg
 function buildNav(){
   $('sidenav').innerHTML=SIDE.map(k=>`<a href="#${k}" data-k="${k}" title="${LABEL[k]}">${ICON[k]}<span class="lb">${LABEL[k]}</span></a>`).join('');
   $('tabbar').innerHTML=TABS.map(k=>k==='chamada'?`<a href="#${k}" data-k="${k}" class="mid"><span class="b">${ICON[k]}</span>${LABEL[k]}</a>`:`<a href="#${k}" data-k="${k}">${ICON[k]}${LABEL[k]}${k==='avisos'?'<span class="badge nbadge">0</span>':''}</a>`).join('');
-  const cor={avisos:'#ef8a1f',notas:'#8a3fd6',descanso:'#7c4dff',turmas:'#0a7cff',lancar:'#e8930c',financeiro:'#1e9b50'},sub={avisos:'Tudo o que chegou nos últimos 7 dias',notas:'N1, N2, média e recuperação',descanso:'Carga semanal, aulas EaD e seminários',turmas:(AULAS.length?AULAS.length+' turmas':'Nenhuma turma ainda')+(TURMAS.length>AULAS.length?' e '+(TURMAS.length-AULAS.length)+' tutorias':'')+' · alunos',lancar:'Moodle IFTO, Portal FASEC e relatórios das tutorias',financeiro:'Renda por fonte e próximos recebimentos'};
+  const cor={avisos:'#ef8a1f',notas:'#8a3fd6',descanso:'#7c4dff',turmas:'#0a7cff',lancar:'#e8930c',financeiro:'#1e9b50'},sub={avisos:'Tudo o que chegou nos últimos 7 dias',notas:'N1, N2, média e recuperação',descanso:'Carga semanal, aulas EaD e seminários',turmas:(AULAS.length?AULAS.length+' turmas':'Nenhuma turma ainda')+(TURMAS.length>AULAS.length?' e '+(TURMAS.length-AULAS.length)+' tutorias':'')+' · alunos',lancar:'Presenças e notas prontas para copiar para o sistema da instituição',financeiro:'Renda por fonte e próximos recebimentos'};
   $('mais-menu').innerHTML=['turmas','notas','financeiro','lancar','descanso'].map(k=>`<a href="#${k}"><span class="ic" style="background:${cor[k]}">${ICON[k]}</span><span>${LABEL[k]}<small>${sub[k]}</small></span><span class="go">›</span></a>`).join('');
 }
 const PAI={aula:'calendario',alunos:'turmas'};
@@ -1475,7 +1476,7 @@ function renderAlunos(){
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(_){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}if(window.PROFY_SYNC)PROFY_SYNC(k)}};
 const REG_INI={};
 let REG=Object.assign({},REG_INI,store.get('cad-reg',{})),MODO_U=store.get('cad-modo',{}),SEM=store.get('cad-sem',{}),IGN=store.get('cad-ign',{});
-const MOTIVOS_G=[['Saúde',['Atestado médico','Consulta ou exame','Acompanhamento de familiar (atestado de acompanhante)']],['Instituição',['Convocação da coordenação ou direção','Reunião no horário (NDE, colegiado)','Evento institucional ou acadêmico','Banca de TCC','Capacitação ou formação']],['Calendário',['Feriado','Recesso','Ponto facultativo','Dia não letivo']],['Estudo',['Encontro do doutorado','Qualificação ou defesa']],['Força maior',['Falta de energia ou problema na sala','Problema na estrada ou no carro','Chuva forte','Greve ou paralisação','Moodle ou internet fora do ar']],['Turma',['Turma ausente ou poucos alunos','Turma em outra atividade do curso']],['Combinado',['Troca de horário com colega','Aula antecipada','Outro']]];
+const MOTIVOS_G=[['Saúde',['Atestado médico','Consulta ou exame','Acompanhamento de familiar (atestado de acompanhante)']],['Instituição',['Convocação da coordenação ou direção','Reunião no horário (NDE, colegiado)','Evento institucional ou acadêmico','Banca de TCC','Capacitação ou formação']],['Calendário',['Feriado','Recesso','Ponto facultativo','Dia não letivo']],['Estudo',['Curso ou pós-graduação','Qualificação ou defesa']],['Força maior',['Falta de energia ou problema na sala','Problema na estrada ou no carro','Chuva forte','Greve ou paralisação','Sistema ou internet fora do ar']],['Turma',['Turma ausente ou poucos alunos','Turma em outra atividade do curso']],['Combinado',['Troca de horário com colega','Aula antecipada','Outro']]];
 const MOTIVOS=MOTIVOS_G.flatMap(g=>g[1]);
 const INI_CONF=new Date(2026,10,16);
 const sk=k=>k.replace(/[^a-z0-9]/gi,'_');
@@ -1742,9 +1743,10 @@ const NOME_INST={IFTO:'IFTO · Campus Porto Nacional',FASEC:'FASEC · Palmas',UN
 const fInst=k=>k==='fapto'?'FAPTO':k==='ifto'?'IFTO':k==='fasec'?'FASEC':k==='uab'?'UAB/UFT':k.startsWith('unitins')?'UNITINS':((FONTES.find(f=>f.k===k)||{}).inst||null);
 function logoIc(inst,sz=28){if(!inst||!MONO[inst])return '';const st=`--sz:${sz}px`;
   return LOGOS[inst]?`<span class="lg-ic img" style="${st}" title="${inst}"><img src="${LOGOS[inst]}" alt="${inst}"></span>`:`<span class="lg-ic" style="${st};background:linear-gradient(160deg,${MONO[inst][1]}cc,${MONO[inst][1]})" title="${inst}" aria-hidden="true">${MONO[inst][0]}</span>`}
+function logosLista(){const L=[...new Set(TURMAS.map(t=>t.inst).concat(ONB.insts.map(i=>i.nome)))].filter(Boolean);L.forEach(k=>{if(!MONO[k])MONO[k]=[k.split(' ').filter(Boolean).map(s=>s[0]).slice(0,2).join('').toUpperCase(),INST[k]]});return L}
 function abrirLogos(){
   $('sheet-in').innerHTML=`<div class="grab"></div><button class="round close" type="button" id="cc-x" aria-label="Fechar">✕</button><h3>Logos das instituições</h3><div class="sub">Envie a logo de cada uma (PNG ou JPG). Ela aparece nas turmas, nas aulas, no calendário e no financeiro.</div>
-   <div style="margin-top:10px">${Object.keys(MONO).map(k=>`<div class="logorow">${logoIc(k,44)}<div class="t"><b>${NOME_INST[k]}</b><span>${LOGOS[k]&&LOGOS[k]!==LOGOS_PADRAO[k]?'Logo enviada por você':LOGOS[k]?'Logo oficial':'Usando as iniciais'}</span></div><label class="btn soft" style="cursor:pointer" for="lg-${MONO[k][0]}">Trocar</label><input type="file" accept="image/&#42;" id="lg-${MONO[k][0]}" data-logo="${k}" hidden>${LOGOS[k]&&LOGOS[k]!==LOGOS_PADRAO[k]?`<button class="xdel" type="button" data-logo-del="${k}" aria-label="Voltar para a logo oficial">✕</button>`:''}</div>`).join('')}</div>`;
+   <div style="margin-top:10px">${logosLista().map((k,ix)=>`<div class="logorow">${logoIc(k,44)}<div class="t"><b>${NOME_INST[k]||k}</b><span>${LOGOS[k]&&LOGOS[k]!==LOGOS_PADRAO[k]?'Logo enviada por você':LOGOS[k]?'Logo oficial':'Usando as iniciais'}</span></div><label class="btn soft" style="cursor:pointer" for="lg-${ix}">Trocar</label><input type="file" accept="image/&#42;" id="lg-${ix}" data-logo="${k}" hidden>${LOGOS[k]&&LOGOS[k]!==LOGOS_PADRAO[k]?`<button class="xdel" type="button" data-logo-del="${k}" aria-label="Voltar para a logo oficial">✕</button>`:''}</div>`).join('')}</div>`;
   $('sheet').classList.add('on')}
 document.addEventListener('change',e=>{const inp=e.target.closest('[data-logo]');if(!inp||!inp.files[0])return;const k=inp.dataset.logo,r=new FileReader();
   r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas'),S=128;c.width=c.height=S;const g=c.getContext('2d'),f=Math.min(S/im.width,S/im.height);g.drawImage(im,(S-im.width*f)/2,(S-im.height*f)/2,im.width*f,im.height*f);
@@ -1832,9 +1834,9 @@ function novaTurma(){form('Nova turma',[{k:'nome',l:'Disciplina',ph:'ex.: Contab
   const enc=v.freq.startsWith('Por encontros');const t={id,inst:v.inst,nome:v.nome,sub:'Turma nova',hor:`${enc?'Encontros':v.dia.slice(0,3)} ${h(v.ini)}–${h(v.fim)}`,ini:h(v.ini),fim:h(v.fim),local:v.inst+' · '+cid,cidade:cid,n:+v.n||0,dia:enc?null:DIAS.indexOf(v.dia)};if(enc){const mp=encMap();mp[id]={n:Math.max(1,+v.nenc||10),p:Math.max(0,+v.nprov||0),d:[]};store.set('cad-enc',mp)}
   U.turmas.push(t);salvaU();aplicaUsuario();fillSelects();renderTurmas();renderCal();renderHoje();toast('Turma adicionada');if(enc)setTimeout(()=>abrirEnc(id),350)})}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-bv]');if(!b)return;const k=b.dataset.bv;if(k==='turma'){go('turmas');setTimeout(novaTurma,250)}else if(k==='fonte'){go('financeiro');setTimeout(novaFonte,250)}else abrirFoto()});
-function novaFonte(){form('Nova fonte de renda',[{k:'nome',l:'Instituição e programa',ph:'ex.: UNITINS · TO Graduado'},{k:'funcao',l:'Função',ph:'ex.: Coordenador de Disciplina'},{k:'tipo',l:'Tipo',opts:['Bolsa','CLT','Contrato temporário','Horista','Prestação de serviço']},{k:'valor',l:'Valor bruto mensal (R$)',type:'number',ph:'1500'},{k:'pag',l:'Quando paga',ph:'ex.: dia 10 do mês seguinte'}],v=>{
+function novaFonte(){form('Nova fonte de renda',[{k:'nome',l:'Instituição e programa',ph:'ex.: Colégio Alfa · reforço'},{k:'funcao',l:'Função',ph:'ex.: Coordenador de Disciplina'},{k:'tipo',l:'Tipo',opts:['Bolsa','CLT','Contrato temporário','Horista','Prestação de serviço']},{k:'valor',l:'Valor bruto mensal (R$)',type:'number',ph:'1500'},{k:'pag',l:'Quando paga',ph:'ex.: dia 10 do mês seguinte'}],v=>{
   if(!v.nome||!v.valor){toast('Preencha a instituição e o valor');return false}
-  const k='f-'+Date.now(),cores=['--s6','--s5','--s3','--s1'];const f={k,c:cores[FONTES.length%4],nome:v.nome,funcao:v.funcao||'—',tipo:v.tipo,pag:v.pag||'—',v:MESES.map((_,i)=>i>=10?+v.valor:0),prox:[ds(10,12),'1º pagamento'],novo:true};
+  const k='f-'+Date.now(),cores=['--s6','--s5','--s3','--s1'];const f={k,c:cores[FONTES.length%4],nome:v.nome,funcao:v.funcao||'—',tipo:v.tipo,pag:v.pag||'—',ano:ANO_FIN,v:MESES.map((_,i)=>i>=MES_FIN?+v.valor:0),prox:[keyOf(HOJE),'1º pagamento'],novo:true};
   U.fontes.push(f);salvaU();aplicaUsuario();renderFin();toast('Fonte de renda adicionada')})}
 function novoCompromisso(){form('Compromisso em '+calSel.toLocaleDateString('pt-BR'),[{k:'t',l:'Descrição',ph:'ex.: Reunião do NDE'},{k:'h',l:'Horário (opcional)',type:'time'}],v=>{
   if(!v.t)return false;const k=keyOf(calSel),txt=(v.h?v.h.replace(':','h')+' · ':'')+v.t;(U.pessoal[k]=U.pessoal[k]||[]).push(txt);PESSOAL[k]=(PESSOAL[k]||[]).concat(txt);salvaU();renderCal();toast('Compromisso salvo e enviado ao Google Agenda')})}
@@ -1853,8 +1855,8 @@ document.addEventListener('click',e=>{
 $('al-add').addEventListener('click',()=>{const nm=$('al-novo').value.trim();if(!nm)return;const t=byId(selTurma),a=alunos(t);(U.alAdd[t.id]=U.alAdd[t.id]||[]).push(nm);a.push({nome:nm,freq:100,n1a:null,n1p:null,n2a:null,n2p:null,rec:null,p:'P',cor:CORES[a.length%CORES.length]});a.sort((x,y)=>x.nome.localeCompare(y.nome,'pt-BR'));t.n=a.length;salvaU();$('al-novo').value='';renderAlunos();toast(nm+' adicionado')});
 
 /* ---------- avisos ---------- */
-const PREF_G=[['No celular · tela bloqueada e por cima da tela',[['aula24','Aula em 24 horas','Matéria, instituição, turma, horário e sala'],['aula30','Aula em 30 minutos','O mesmo aviso, meia hora antes'],['receb','Dia do pagamento','Salário, 13º e bolsas, com o líquido estimado'],['prova','Prova em 7 dias','Para montar e imprimir a prova'],['dout','Doutorado em dia de aula','Na segunda e na terça da mesma semana: plano para quem vai substituir e atividade da turma']]],
- ['Só no sininho do app',[['semplano','Aula sem plano','2 dias antes, com as sugestões'],['conf','Confirmar aula dada','Às 23h dos dias de aula'],['sem','Seminário: 1 aula antes','Para pedir à turma que se prepare'],['lanc','Notas das provas da UAB','No domingo depois de cada prova, para lançar no Moodle UAB'],['tutoria','Relatórios das tutorias','RTP da UNITINS e relatório da UAB'],['descanso','Semana acima do limite','No sábado anterior'],['feriado','Feriado que tira aula','1 semana antes, para avisar as turmas']]]];
+const PREF_G=[['No celular · tela bloqueada e por cima da tela',[['aula24','Aula em 24 horas','Matéria, instituição, turma, horário e sala'],['aula30','Aula em 30 minutos','O mesmo aviso, meia hora antes'],['receb','Dia do pagamento','Salário, 13º e bolsas, com o líquido estimado'],['prova','Prova em 7 dias','Para montar e imprimir a prova']]],
+ ['Só no sininho do app',[['semplano','Aula sem plano','2 dias antes, com as sugestões'],['conf','Confirmar aula dada','Às 23h dos dias de aula'],['sem','Seminário: 1 aula antes','Para pedir à turma que se prepare'],['descanso','Semana acima do limite','No sábado anterior'],['feriado','Feriado que tira aula','1 semana antes, para avisar as turmas']]]];
 const PUSH=new Set(['aula24','aula30','receb','prova','dout']);
 const PREF=Object.assign(Object.fromEntries(PREF_G.flatMap(g=>g[1]).map(x=>[x[0],true])),store.get('cad-avisos',{}));
 const UAB_PROVAS=store.get('cad-uab-provas',[]);
@@ -1877,13 +1879,13 @@ function avisos(R){const L=[],add=(quando,tipo,cor,ic,tit,txt,go)=>{if(PREF[tipo
     if(DOUT_DIAS.has(keyOf(dd))&&dd.getDay()===5){const ids=aulasDoDia(dd);if(ids.length){const nomes=ids.map(id=>byId(id).nome).join(' e '),go='aula:'+ids[0]+'|'+keyOf(dd);
       [-4,-3].forEach(o=>add(at(addD(dd,o),9),'dout','#7c4dff',IA.moon,`Doutorado na sexta ${dd.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}: ${nomes}`,'Monte o plano para quem vai substituir e a atividade para a turma fazer.',go))}}
     feriadosDoDia(addD(dd,7)).filter(f=>f.afeta.some(x=>!f.mantida.includes(x))).forEach(f=>add(at(dd,9),'feriado','#e0383b',IA.sem,`Avise as turmas: ${f.nome}`,`Sem aula em ${dShort(addD(dd,7))}: ${[...new Set(f.afeta.map(x=>byId(x).nome))].join(', ')}.`,'calendario'));
-    if(dd.getDate()===new Date(dd.getFullYear(),dd.getMonth()+1,0).getDate()-3)add(at(dd,9),'tutoria','#0e8fa1',IA.doc,'RTP da UNITINS vence em 3 dias','Relatório Técnico Parcial do MBA · enviar até o último dia do mês.','lancar');
-    if(dd.getDate()===12)add(at(dd,9),'tutoria','#3f5ef0',IA.doc,'Relatório mensal da UAB até dia 15','Tutoria a distância · Administração Pública EaD.','lancar');
+    if(TURMAS.some(t=>t.inst==='UNITINS'&&t.tipo==='tutoria')&&dd.getDate()===new Date(dd.getFullYear(),dd.getMonth()+1,0).getDate()-3)add(at(dd,9),'tutoria','#0e8fa1',IA.doc,'RTP da UNITINS vence em 3 dias','Relatório Técnico Parcial do MBA · enviar até o último dia do mês.','lancar');
+    if(TURMAS.some(t=>t.inst==='UAB/UFT')&&dd.getDate()===12)add(at(dd,9),'tutoria','#3f5ef0',IA.doc,'Relatório mensal da UAB até dia 15','Tutoria a distância · Administração Pública EaD.','lancar');
     UAB_PROVAS.forEach(pk=>{const pd=fromKey(pk),dom=addD(pd,(7-pd.getDay())%7||7);if(keyOf(dom)===keyOf(dd))add(at(dd,9),'lanc','#3f5ef0',IA.doc,'Lançar as notas da prova da UAB',`Prova de ${dShort(pd)} · Administração Pública EaD · Moodle UAB.`,'lancar')})}
   if(PREF.sem){const vistos=new Set();
     [...Object.keys(SEM).map(k=>({k,tema:SEM[k],ag:true})),...sugestoes().filter(x=>x.acao==='sem'||x.acao==='ead').map(x=>({k:x.k,tema:(SEMINARIOS[x.id]||['tema livre'])[0],ag:false}))].forEach(c=>{if(vistos.has(c.k))return;vistos.add(c.k);const[id,k]=c.k.split('|'),dt=fromKey(k),ant=aulaAnterior(id,dt),t=byId(id);if(!t||!ant)return;
       add(inicio(id,ant),'sem','#7c4dff',IA.sem,`Avise ${t.nome} sobre o seminário`,c.ag?`Peça para a turma preparar o seminário de ${dShort(dt)}: “${c.tema}”.`:`A aula de ${dShort(dt)} pode ser seminário (“${c.tema}”). Se for usar, avise nesta aula.`,'aula:'+id+'|'+keyOf(ant))})}
-  semanas().forEach(w=>{if(w.au+w.dout>LIMITE)add(at(addD(w.ini,-2),10),'descanso','#7c4dff',IA.moon,`Semana de ${w.ini.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} passa do seu limite`,`${Math.round(w.au+w.dout)}h entre aulas e doutorado. Veja as sugestões de EaD e seminário.`,'descanso')});
+  semanas().forEach(w=>{if(w.au+w.dout>LIMITE)add(at(addD(w.ini,-2),10),'descanso','#7c4dff',IA.moon,`Semana de ${w.ini.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})} passa do seu limite`,`${Math.round(w.au+w.dout)}h de aulas. Veja as sugestões de EaD e seminário.`,'descanso')});
   recebimentos().forEach(r=>add(at(r.dt,8),'receb','#1e9b50',IA.money,`Hoje cai: ${r.f.nome.split(' · ')[0]} · ${r.tipo}`,`Líquido estimado ${brl(r.liq)}. Confira se veio certo.`,'financeiro'));
   /* só os avisos que já chegaram (como no celular), dos últimos 7 dias */
   if(R)return L;
@@ -1905,7 +1907,7 @@ function badge(){const n=avisos().filter(a=>a.at>VISTO).length;document.querySel
 const diaRot=d=>{const x=new Date(d);x.setHours(0,0,0,0);const h=new Date(HOJE);h.setHours(0,0,0,0);const df=Math.round((h-x)/864e5);return df===0?'Hoje':df===1?'Ontem':dShort(x)};
 function pushHtml(){const e=window.PROFY_PUSH_ESTADO?PROFY_PUSH_ESTADO():'sem-ponte';
   if(e==='ativo')return '<div class="pushbox on"><b>Notificações do Profy ligadas</b><span>Os avisos do grupo “No celular” chegam na tela do aparelho, com o ícone do Profy.</span><button type="button" class="pb2" data-push="off">Desligar</button></div>';
-  if(e==='inativo')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Aula, pagamento, prova e doutorado aparecem na tela bloqueada, com o ícone do Profy.</span><button type="button" class="pb1" data-push="on">Ativar notificações do Profy</button></div>';
+  if(e==='inativo')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Aula, pagamento e prova aparecem na tela bloqueada, com o ícone do Profy.</span><button type="button" class="pb1" data-push="on">Ativar notificações do Profy</button></div>';
   if(e==='negado')return '<div class="pushbox"><b>Notificações bloqueadas</b><span>Libere em Ajustes do iPhone › Notificações › Profy e volte aqui.</span></div>';
   if(e==='sem-suporte')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Abra o Profy pelo ícone na Tela de Início do iPhone (iOS 16.4 ou mais novo) para ligar as notificações.</span></div>';
   return ''}
@@ -2162,30 +2164,35 @@ $('nt-body').addEventListener('input',()=>salvaNotas(byId(ntTurma.value)));
 
 /* ---------- LANÇAR ---------- */
 let PEND=[];
-let portal='Moodle IFTO',selPend=null;
-const PORTAIS=['Moodle IFTO','Portal FASEC','Tutoria'];
-const valor=(p,s)=>p.tipo==='freq'?s.p:fmt(nota1(s));
+let portal='',selPend=null,PORTAIS=[],LP=[];
+const LANC=store.get('cad-lanc',{});
+const valor=(p,s)=>p.tipo==='freq'?(((CHS[p.turma+'|'+p.k]||{}).f||{})[s.nome]||'P'):p.tipo==='n2'?fmt(nota2(s)):fmt(nota1(s));
+function montaPend(){const L=[];
+  Object.keys(CHS).sort().reverse().forEach(c=>{const i=c.lastIndexOf('|'),id=c.slice(0,i),k=c.slice(i+1),t=byId(id);if(!t||t.tipo!=='aula')return;L.push({id:'f:'+c,portal:t.inst,turma:id,k,o:'Presença de '+dShort(fromKey(k)),tipo:'freq'})});
+  AULAS.forEach(t=>{try{aplicaNotas(t)}catch(_){}const a=alunos(t);if(a.some(s=>nota1(s)!=null))L.push({id:'n1:'+t.id,portal:t.inst,turma:t.id,o:'Notas da N1',tipo:'n1'});if(a.some(s=>nota2(s)!=null))L.push({id:'n2:'+t.id,portal:t.inst,turma:t.id,o:'Notas da N2',tipo:'n2'})});
+  L.forEach(p=>{p.st=LANC[p.id]?'done':'pend';p.prazo=LANC[p.id]?'feito':'a lançar'});return L}
 function textoRel(p){const t=byId(p.turma);
-  return `${t.rel} · ${t.inst}\n${t.nome} · ${t.sub}\nPeríodo: 01/11/2026 a 30/11/2026\n\n1. Acompanhamento de ${t.n} alunos no ambiente virtual.\n2. Correção e devolutiva de ${t.corrigir+23} atividades.\n3. Taxa de entrega das atividades: ${t.entrega}%.\n4. Atendimento de dúvidas pelo ambiente virtual e por e-mail.\n5. Contato com ${Math.round(t.n*(100-t.entrega)/100)} alunos com atividades em atraso.`}
+  return `${t.rel} · ${t.inst}\n${t.nome} · ${t.sub}\nPeríodo: ${'01/'+String(MES_FIN+1).padStart(2,'0')+'/'+ANO_FIN} a ${new Date(ANO_FIN,MES_FIN+1,0).toLocaleDateString('pt-BR')}\n\n1. Acompanhamento de ${t.n} alunos no ambiente virtual.\n2. Correção e devolutiva de ${t.corrigir+23} atividades.\n3. Taxa de entrega das atividades: ${t.entrega}%.\n4. Atendimento de dúvidas pelo ambiente virtual e por e-mail.\n5. Contato com ${Math.round(t.n*(100-t.entrega)/100)} alunos com atividades em atraso.`}
 function renderLancar(){
-  $('portais').innerHTML=PORTAIS.map(p=>{const n=PEND.filter(x=>x.portal===p&&x.st!=='done').length;return `<button type="button" aria-pressed="${p===portal}" data-p="${p}">${p}${n?` · ${n}`:''}</button>`}).join('');
-  const l=PEND.filter(x=>x.portal===portal);
+  LP=montaPend();PORTAIS=[...new Set(AULAS.map(t=>t.inst))];if(!PORTAIS.includes(portal))portal=PORTAIS[0]||'';
+  $('portais').innerHTML=PORTAIS.map(p=>{const n=LP.filter(x=>x.portal===p&&x.st!=='done').length;return `<button type="button" aria-pressed="${p===portal}" data-p="${p}">${p}${n?` · ${n}`:''}</button>`}).join('');
+  const l=LP.filter(x=>x.portal===portal);
   if(!l.some(x=>x.id===selPend))selPend=(l.find(x=>x.st!=='done')||l[0]||{}).id;
-  $('lc-titulo').textContent=portal==='Tutoria'?'Tutorias · Plataforma A (UNITINS) e Moodle UAB':`Pendências · ${portal}`;
-  $('lc-lista').innerHTML=l.map(p=>{const t=byId(p.turma);return `<div class="portal"><button class="check" type="button" data-done="${p.id}" aria-pressed="${p.st==='done'}" aria-label="Marcar como feito"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></button><div class="t" data-sel="${p.id}"><b style="${p.id===selPend?'color:var(--accent)':''}">${p.portal==='Tutoria'?t.inst+' · '+t.nome:t.nome}</b><span>${p.o}</span></div><span class="chip ${p.st}">${p.prazo}</span></div>`}).join('');
-  const p=PEND.find(x=>x.id===selPend),pre=$('lc-prev');
-  if(!p){pre.textContent='Nada pendente aqui.';return}
+  $('lc-titulo').textContent=portal?`Para lançar · ${portal}`:'Para lançar';
+  $('lc-lista').innerHTML=l.map(p=>{const t=byId(p.turma);return `<div class="portal"><button class="check" type="button" data-done="${p.id}" aria-pressed="${p.st==='done'}" aria-label="Marcar como feito"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></button><div class="t" data-sel="${p.id}"><b style="${p.id===selPend?'color:var(--accent)':''}">${p.portal==='Tutoria'?t.inst+' · '+t.nome:t.nome}</b><span>${p.o}</span></div><span class="chip ${p.st}">${p.prazo}</span></div>`}).join('')||'<p class="demo" style="text-align:left">Nada para lançar aqui ainda.</p>';
+  const p=LP.find(x=>x.id===selPend),pre=$('lc-prev');
+  if(!p){$('lc-prev-t').textContent='Pronto para colar';pre.textContent=AULAS.length?'Quando você salvar uma chamada ou digitar notas, elas aparecem aqui, prontas para copiar.':'Cadastre uma turma para começar.';$('lc-dica').textContent='';return}
   const t=byId(p.turma);
   if(p.tipo==='rel'){$('lc-prev-t').textContent='Resumo do mês para o relatório';pre.textContent=textoRel(p);$('lc-dica').textContent='Montado com o que você registrou na tutoria. Cole no formulário do relatório e ajuste o que precisar.'}
   else{$('lc-prev-t').textContent=`Pronto para colar · ${t.nome}`;pre.textContent=alunos(t).map(s=>s.nome.padEnd(30,' ')+'\t'+valor(p,s)).join('\n');$('lc-dica').textContent='Na ordem do diário (alfabética). Clique no campo do primeiro aluno no portal e cole: cada linha cai no aluno certo.'}
 }
 $('portais').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b){portal=b.dataset.p;selPend=null;renderLancar()}});
 $('lc-lista').addEventListener('click',e=>{
-  const s=e.target.closest('[data-sel]');if(s){selPend=+s.dataset.sel;renderLancar()}
-  const d=e.target.closest('[data-done]');if(d){const p=PEND.find(x=>x.id==d.dataset.done);if(p.st==='done'){p.st='pend';p.prazo='reaberto'}else{p.st='done';p.prazo='feito hoje'}renderLancar();renderHoje()}
+  const s=e.target.closest('[data-sel]');if(s){selPend=s.dataset.sel;renderLancar()}
+  const d=e.target.closest('[data-done]');if(d){const id=d.dataset.done;if(LANC[id])delete LANC[id];else LANC[id]=1;store.set('cad-lanc',LANC);renderLancar()}
 });
-$('lc-marcar').addEventListener('click',()=>{const p=PEND.find(x=>x.id===selPend);if(!p)return;p.st='done';p.prazo='feito hoje';renderLancar();renderHoje();toast('Marcado como feito')});
-$('lc-copiar').addEventListener('click',async()=>{const p=PEND.find(x=>x.id===selPend);if(!p)return;
+$('lc-marcar').addEventListener('click',()=>{const p=LP.find(x=>x.id===selPend);if(!p)return;LANC[p.id]=1;store.set('cad-lanc',LANC);renderLancar();toast('Marcado como feito')});
+$('lc-copiar').addEventListener('click',async()=>{const p=LP.find(x=>x.id===selPend);if(!p)return;
   const txt=p.tipo==='rel'?textoRel(p):alunos(byId(p.turma)).map(s=>valor(p,s)).join('\n');
   try{await navigator.clipboard.writeText(txt);toast('Copiado · cole no portal')}catch(_){toast('Selecione o texto e copie')}});
 
@@ -2235,6 +2242,10 @@ function irrf(bruto,ins){const base=Math.max(0,bruto-Math.max(ins,607.20));let t
 const CLT=new Proxy({},{get:(o,k)=>{const f=FONTES.find(x=>x.k===k);return !!(f&&/CLT|Contrato|Horista/i.test(f.tipo))}});
 function folha(k,bruto){if(!CLT[k])return{bruto,ins:0,ir:0,liq:bruto};const ins=inss(bruto),ir=irrf(bruto,ins);return{bruto,ins,ir,liq:Math.round((bruto-ins-ir)*100)/100}}
 const F=k=>FONTES.find(f=>f.k===k);
+function vMes(f,y,m){try{const rr=(REAL[f.k]||{})[y+'-'+String(m+1).padStart(2,'0')];if(rr&&rr.bruto)return rr.bruto}catch(_){}const a=f.ano||2026,b=f.v||[];if(y<a)return 0;let x=y===a?(+b[m]||0):(+b[11]||0);if(!x&&y>a&&f.tipo==='Bolsa'&&f.bolsa)x=+f.bolsa;if(x&&f.fim&&y*12+m>f.fim)x=0;return x}
+const va=f=>MESES.map((_,m)=>vMes(f,ANO_FIN,m));
+const vRef=f=>{const a=va(f);return a[MES_FIN]||a[11]||a.slice().reverse().find(x=>x)||0};
+const absM=d=>d.getFullYear()*12+d.getMonth();
 const media26=k=>F(k).v.reduce((a,b)=>a+b,0)/12;
 function extras(k){
   if(k==='fapto')return[
@@ -2248,12 +2259,13 @@ function extras(k){
     {tipo:'Férias (parte)',quando:'Julho · já recebida · faltam 17,5 dias do período 12/02/2026–11/02/2027',bruto:null,liq:null,k:'kfer',ok:true},
     {tipo:'13º · 1ª parcela',quando:'Até 30/11 · 50% de 11/12, sem desconto',bruto:2130.95,liq:2130.95,k:'k13'},
     {tipo:'13º · 2ª parcela',quando:'Até 18/12 · com INSS do 13º',bruto:2130.95,liq:1717.95,k:'k13'}];
+  {const f=F(k);if(f&&f.tipo!=='Bolsa')return f.d13===false||/Prest/i.test(f.tipo)?[{tipo:'13º e férias',quando:'Este vínculo não paga 13º nem férias',bruto:null,liq:null}]:[{tipo:'13º salário',quando:'1ª parcela até 30/11 e 2ª até 20/12',bruto:null,liq:null,k:'k13'},{tipo:'Férias + 1/3',quando:'Conforme a escala da instituição',bruto:null,liq:null,k:'kfer'}]}
   return[{tipo:'Bolsa',quando:'Bolsa não tem 13º nem férias',bruto:null,liq:null}]}
 function recebimentos(){const L=[];
-  FONTES.forEach(f=>[10,11].forEach(m=>{const b=f.v[m];if(!b)return;const dt=new Date(2026,m+1,0);L.push({dt,f,tipo:(f.tipo==='Bolsa'?'Bolsa de ':'Pagamento de ')+MESN[m],bruto:b,liq:folha(f.k,b).liq,st:'estimado',q:f.pag&&f.pag!=='—'?f.pag:''})}));
+  FONTES.forEach(f=>[ABS_FIN,ABS_FIN+1].forEach(a=>{const y=Math.floor(a/12),m=a%12,b=vMes(f,y,m);if(!b)return;const dt=new Date(y,m+1,0);L.push({dt,f,tipo:(f.tipo==='Bolsa'?'Bolsa de ':'Pagamento de ')+MESN[m],bruto:b,liq:folha(f.k,b).liq,st:'estimado',q:f.pag&&f.pag!=='—'&&f.pag.length<=18?f.pag:''})}));
   return L.sort((a,b)=>a.dt-b.dt)}
-const MES_REC=HOJE.getFullYear()===2026&&HOJE.getMonth()===11?11:10;const receb=()=>recebimentos().filter(r=>r.dt.getMonth()===MES_REC);
-let rcMes=MES_REC;
+const receb=()=>recebimentos().filter(r=>absM(r.dt)===ABS_FIN);
+let rcMes=ABS_FIN;
 const nomeCurto=f=>f.nome.split(' · ')[0]+(f.k==='unitins-mba'?' · MBA':f.k==='unitins-tog'?' · TO Graduado':'');
 function linhaReceb(r){const kc=r.tipo.startsWith('13')?'k13':r.tipo.startsWith('Férias')?'kfer':r.f.tipo==='Bolsa'?'kbol':'ksal',bol=r.f.tipo==='Bolsa';
   const d=r.dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','').replace(' de ',' ');
@@ -2267,7 +2279,7 @@ Object.entries(REAL_BASE).forEach(([k,o])=>{REAL[k]=Object.assign({},o,REAL[k]||
 const MESN=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const compRot=c=>{const[y,m]=c.split('-');return MESN[+m-1]+'/'+y};
 const ultimoReal=k=>{const r=REAL[k];if(!r)return null;const c=Object.keys(r).sort().pop();return c?Object.assign({comp:c},r[c]):null};
-function aplicaReal(){Object.entries(REAL).forEach(([k,cs])=>{const f=F(k);if(!f)return;Object.entries(cs).forEach(([c,r])=>{const[y,m]=c.split('-');if(y==='2026')f.v[+m-1]=r.bruto;if(r.cargo)f.funcao=r.cargoFmt||f.funcao})})}
+function aplicaReal(){Object.entries(REAL).forEach(([k,cs])=>{const f=F(k);if(!f)return;Object.entries(cs).forEach(([c,r])=>{const[y,m]=c.split('-');if(+y===(f.ano||2026))f.v[+m-1]=r.bruto;if(r.cargo)f.funcao=r.cargoFmt||f.funcao})})}
 const liqReal=(k,c,est)=>REAL[k]&&REAL[k][c]?REAL[k][c].liq:est;
 let pdfPronto=null;
 function carregaPdfJs(){if(pdfPronto)return pdfPronto;const add=src=>new Promise((ok,er)=>{const x=document.createElement('script');x.src=src;x.onload=ok;x.onerror=er;document.head.appendChild(x)});
@@ -2342,12 +2354,12 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-imp]');if(
   const m=e.target.closest('[data-manual]');if(m){revisar({k:m.dataset.manual,itens:[]},'')}});
 
 function abrirCC(k){const RR=ultimoReal(k);if(RR){$('sheet-in').innerHTML=ccRealHtml(k,RR);$('sheet').classList.add('on');return}
-  const f=F(k);if(!f)return;const sal=f.v[10],fo=folha(k,sal),ex=extras(k),pct=v=>sal?((v/sal)*100).toFixed(1).replace('.',',')+'%':'';
-  const linhas=CLT[k]?`<tr class="sec"><td colspan="3">Proventos</td></tr><tr><td>${k==='fasec'?'Horas-aula do mês':'Salário base'}</td><td class="ref">30 dias</td><td>${b2(sal)}</td></tr>
+  const f=F(k);if(!f)return;const sal=vRef(f),fo=folha(k,sal),ex=extras(k),pct=v=>sal?((v/sal)*100).toFixed(1).replace('.',',')+'%':'';
+  const linhas=CLT[k]?`<tr class="sec"><td colspan="3">Proventos</td></tr><tr><td>${k==='fasec'||/Horista/i.test(f.tipo)?'Horas-aula do mês':'Salário base'}</td><td class="ref">30 dias</td><td>${b2(sal)}</td></tr>
     <tr class="sec"><td colspan="3">Descontos</td></tr><tr><td>INSS (tabela 2026)</td><td class="ref">${pct(fo.ins)}</td><td class="neg">− ${b2(fo.ins)}</td></tr><tr><td>Imposto de Renda retido</td><td class="ref">${pct(fo.ir)}</td><td class="neg">− ${b2(fo.ir)}</td></tr>`
    :`<tr class="sec"><td colspan="3">Proventos</td></tr><tr><td>Bolsa mensal</td><td class="ref">1 mês</td><td>${b2(sal)}</td></tr><tr class="sec"><td colspan="3">Descontos</td></tr><tr><td>Sem desconto na fonte informado</td><td class="ref"></td><td>${b2(0)}</td></tr>`;
   $('sheet-in').innerHTML=`<div class="grab"></div><button class="round close" type="button" id="cc-x" aria-label="Fechar">✕</button>
-   <div style="display:flex;align-items:center;gap:10px">${logoIc(fInst(k),40)}<span class="kind">${f.tipo}</span></div><h3>${f.nome}</h3><div class="sub">${f.funcao} · competência novembro/2026</div>
+   <div style="display:flex;align-items:center;gap:10px">${logoIc(fInst(k),40)}<span class="kind">${f.tipo}</span></div><h3>${f.nome}</h3><div class="sub">${f.funcao} · competência ${MESN[MES_FIN]}/${ANO_FIN}</div>
    <table class="cc"><thead><tr><th>Descrição</th><th style="text-align:right">Ref.</th><th>Valor</th></tr></thead><tbody>${linhas}</tbody></table>
    <div class="liq"><span>Líquido estimado</span><b>${b2(fo.liq)}</b></div>
    <div class="card" style="padding:0;margin-top:16px"><h2 style="margin:0 0 4px">Férias e 13º</h2></div>
@@ -2359,43 +2371,43 @@ function abrirCC(k){const RR=ultimoReal(k);if(RR){$('sheet-in').innerHTML=ccReal
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cc]');if(c){if(e.target.closest('[data-del-fonte]'))return;abrirCC(c.dataset.cc);return}if(e.target.id==='sheet'||e.target.closest('#cc-x'))$('sheet').classList.remove('on')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('sheet').classList.remove('on');if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.cc)abrirCC(e.target.dataset.cc)});
 $('rc-mes').addEventListener('click',e=>{const b=e.target.closest('[data-mes]');if(b){rcMes=+b.dataset.mes;renderReceb()}});
-function renderReceb(){$('rc-mes').innerHTML=[[10,'Novembro'],[11,'Dezembro']].map(([m,l])=>`<button type="button" data-mes="${m}" aria-pressed="${m===rcMes}">${l}</button>`).join('');
-  const L=recebimentos().filter(r=>r.dt.getMonth()===rcMes);$('fin-receb').innerHTML=L.map(linhaReceb).join('')+`<div class="rctot"><span>Total líquido previsto</span><b>${brl(L.reduce((a,r)=>a+r.liq,0))}</b></div>`}
+function renderReceb(){$('rc-mes').innerHTML=[ABS_FIN,ABS_FIN+1].map(a=>[a,MESN[a%12][0].toUpperCase()+MESN[a%12].slice(1)+(Math.floor(a/12)!==ANO_FIN?' de '+Math.floor(a/12):'')]).map(([m,l])=>`<button type="button" data-mes="${m}" aria-pressed="${m===rcMes}">${l}</button>`).join('');
+  const L=recebimentos().filter(r=>absM(r.dt)===rcMes);$('fin-receb').innerHTML=(L.length?L.map(linhaReceb).join(''):'<p class="demo" style="text-align:left">Nenhum recebimento previsto neste mês.</p>')+`<div class="rctot"><span>Total líquido previsto</span><b>${brl(L.reduce((a,r)=>a+r.liq,0))}</b></div>`}
 const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 function renderFin(){
-  const tot=MESES.map((_,i)=>FONTES.reduce((s,x)=>s+x.v[i],0)),dez=tot[11],jan=tot[0];
+  const tot=MESES.map((_,i)=>FONTES.reduce((s,x)=>s+va(x)[i],0)),dez=tot[11],jan=tot[0];{const e=$('fin-ano');if(e)e.textContent=ANO_FIN+(MES_FIN<11?' · '+MESES[MES_FIN+1]+(MES_FIN<10?' em diante':'')+' previsto':'')}
   const IC={a:'<svg class="ico" viewBox="0 0 32 32"><rect x="5" y="9" width="22" height="16" rx="4" fill="#5b8cff"/><circle cx="16" cy="17" r="4" fill="#fff" opacity=".9"/><rect x="9" y="6" width="14" height="4" rx="2" fill="#9db8ff"/></svg>',b:'<svg class="ico" viewBox="0 0 32 32" fill="none" stroke="#1e9b50" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 23l8-8 5 4 9-10"/><path d="M21 9h6v6"/></svg>',c:'<svg class="ico" viewBox="0 0 32 32"><ellipse cx="16" cy="22" rx="10" ry="4" fill="#e8a317"/><ellipse cx="16" cy="17" rx="10" ry="4" fill="#f5b82e"/><ellipse cx="16" cy="12" rx="10" ry="4" fill="#ffd35c"/></svg>',d:'<svg class="ico" viewBox="0 0 32 32" fill="none" stroke="#3f5ef0" stroke-width="2.6" stroke-linejoin="round"><path d="M16 5l11 6-11 6-11-6z" fill="#cdd7ff"/><path d="M5 16l11 6 11-6M5 21l11 6 11-6"/></svg>'};
-  const liqNov=recebimentos().filter(r=>r.dt.getMonth()===MES_REC).reduce((a,r)=>a+r.liq,0);
-  $('fin-tiles').innerHTML=[[IC.a+brl(Math.round(liqNov)),'líquido a receber em '+(MES_REC===11?'dezembro':'novembro'),'var(--s3)'],[IC.b+(jan?`<span class="up">+${Math.round((dez/jan-1)*100)}%</span>`:'—'),'renda bruta de jan a dez','var(--ok)'],[IC.c+brl(Math.round(tot.slice(0,11).reduce((a,b)=>a+b,0)/11)),'média bruta mensal até nov','var(--accent)'],[IC.d+FONTES.length,'fontes de renda','var(--s6)']]
+  const liqNov=receb().reduce((a,r)=>a+r.liq,0);
+  $('fin-tiles').innerHTML=[[IC.a+brl(Math.round(liqNov)),'líquido a receber em '+MESN[MES_FIN],'var(--s3)'],[IC.b+(jan?`<span class="up"${dez<jan?' style="color:var(--bad)"':''}>${dez>=jan?'+':''}${Math.round((dez/jan-1)*100)}%</span>`:'—'),'renda bruta de jan a dez','var(--ok)'],[IC.c+brl(Math.round(tot.slice(0,MES_FIN+1).reduce((a,b)=>a+b,0)/(MES_FIN+1))),'média bruta mensal até '+MESES[MES_FIN],'var(--accent)'],[IC.d+FONTES.length,'fontes de renda','var(--s6)']]
     .map(([n,l,c])=>`<div class="tile glass"><span class="n">${n}</span><span class="l">${l}</span></div>`).join('');
-  const insT=FONTES.filter(f=>CLT[f.k]).reduce((a,f)=>a+folha(f.k,f.v[10]).ins,0),teto=inss(TETO);
-  $('fin-alerta').innerHTML=insT>teto?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg><div><b>INSS acima do teto: cerca de ${brl(Math.round(insT-teto))} por mês a mais</b><span>FAPTO, IFTO e FASEC descontam INSS separadamente (${brl(Math.round(insT))} somados), mas o máximo em 2026 é ${b2(teto)}. A diferença entra no seu pedido de restituição. O IR também é retido separado em cada fonte; no ajuste anual a soma pode gerar imposto a pagar.</span></div>`:'';
+  const insT=FONTES.filter(f=>CLT[f.k]).reduce((a,f)=>a+folha(f.k,va(f)[MES_FIN]).ins,0),teto=inss(TETO);
+  $('fin-alerta').innerHTML=insT>teto?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/></svg><div><b>INSS acima do teto: cerca de ${brl(Math.round(insT-teto))} por mês a mais</b><span>Cada vínculo com carteira desconta o INSS separadamente (${brl(Math.round(insT))} somados), mas o máximo por mês é ${b2(teto)} (tabela de 2026). A diferença pode ser pedida de volta à Receita Federal. O IR também é retido separado em cada fonte; no ajuste anual a soma pode gerar imposto a pagar.</span></div>`:'';
   $('fin-lg').innerHTML=FONTES.map(s=>`<span><i style="background:var(${s.c})"></i>${s.nome.split(' · ')[0]}${s.k==='unitins-mba'?' · MBA':s.k==='unitins-tog'?' · TO Graduado':''}</span>`).join('');
-  const W=Math.max(320,$('fin-wrap').clientWidth||640),H=240,pl=46,pr=6,pt=14,pb=26,iw=W-pl-pr,ih=H-pt-pb,max=25000;
+  const W=Math.max(320,$('fin-wrap').clientWidth||640),H=240,pl=46,pr=6,pt=14,pb=26,iw=W-pl-pr,ih=H-pt-pb,mx=Math.max(1,...tot),passo=mx<=5000?1000:mx<=10000?2000:mx<=25000?5000:mx<=50000?10000:20000,max=Math.ceil(mx/passo)*passo;
   const bw=iw/12,bar=Math.min(30,bw*.62),y=v=>pt+ih-v/max*ih;
-  let g='<g class="grid">';for(let v=0;v<=max;v+=5000)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}"/><text x="${pl-8}" y="${y(v)+4}" text-anchor="end">${v?('R$ '+v/1000+' mil'):'0'}</text>`;g+='</g>';
+  let g='<g class="grid">';for(let v=0;v<=max;v+=passo)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}"/><text x="${pl-8}" y="${y(v)+4}" text-anchor="end">${v?('R$ '+v/1000+' mil'):'0'}</text>`;g+='</g>';
   let b='';
   MESES.forEach((m,i)=>{
-    const x=pl+bw*i+(bw-bar)/2,segs=FONTES.map(s=>({s,v:s.v[i]})).filter(o=>o.v>0),op=i===11?' opacity=".55"':'';let acc=0;
+    const x=pl+bw*i+(bw-bar)/2,segs=FONTES.map(s=>({s,v:va(s)[i]})).filter(o=>o.v>0),op=i>MES_FIN?' opacity=".55"':'';let acc=0;
     segs.forEach((o,j)=>{const y0=y(acc),y1=y(acc+o.v),top=j===segs.length-1,h=y0-y1-(j>0?2:0),c=cssv(o.s.c),r=top?4:0;acc+=o.v;
       b+=top?`<path${op} d="M${x} ${y1+h}V${y1+r}Q${x} ${y1} ${x+r} ${y1}H${x+bar-r}Q${x+bar} ${y1} ${x+bar} ${y1+r}V${y1+h}Z" fill="${c}"/>`:`<rect${op} x="${x}" y="${y1}" width="${bar}" height="${Math.max(0,h)}" fill="${c}"/>`});
     b+=`<text x="${x+bar/2}" y="${H-8}" text-anchor="middle">${W<560&&i%2?'':m}</text>`;
     b+=`<rect class="hit" data-m="${i}" x="${pl+bw*i}" y="${pt}" width="${bw}" height="${ih}" rx="6"/>`;
   });
-  b+=`<text x="${pl+bw*11+bw/2}" y="${y(dez)-6}" text-anchor="middle" style="fill:var(--ink);font-weight:800">${(dez/1000).toFixed(1).replace('.',',')} mil</text>`;
+  if(tot[MES_FIN])b+=`<text x="${MES_FIN===0?pl+(bw-bar)/2:MES_FIN===11?pl+bw*12-(bw-bar)/2:pl+bw*MES_FIN+bw/2}" y="${y(tot[MES_FIN])-6}" text-anchor="${MES_FIN===0?'start':MES_FIN===11?'end':'middle'}" style="fill:var(--ink);font-weight:800">${(tot[MES_FIN]/1000).toFixed(1).replace('.',',')} mil</text>`;
   const svg=$('fin-chart');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML=g+b;
   renderReceb();
-  $('fin-fontes').innerHTML=FONTES.map(f=>{const fo=folha(f.k,f.v[11]);return `<div class="fonte click" data-cc="${f.k}" role="button" tabindex="0"><span class="sw" style="background:var(${f.c})"></span>${logoIc(fInst(f.k),34)}<div class="t"><b>${f.nome}${f.novo?'<span class="newtag">NOVA</span>':''}${ultimoReal(f.k)?'<span class="realtag">real · '+compRot(ultimoReal(f.k).comp).split('/')[0]+'</span>':''}</b><span>Função: ${f.funcao}</span><span>${f.tipo} · pagamento: ${f.pag}</span></div><div class="v vv">${f.tipo==='Bolsa'?`<b>${brl(f.v[11]||f.bolsa||0)}</b><small>Bolsa${f.v[11]?'':' · a partir de 2027'}</small>`:`<b>${brl(Math.round(liqReal(f.k,'2026-12',fo.liq)))}</b><small>Bruto <em>${brl(f.v[11])}</em></small>`}</div><button class="xdel ed-only" type="button" data-del-fonte="${f.k}" aria-label="Remover ${f.nome}">✕</button></div>`}).join('');
+  $('fin-fontes').innerHTML=FONTES.map(f=>{const fo=folha(f.k,vRef(f));return `<div class="fonte click" data-cc="${f.k}" role="button" tabindex="0"><span class="sw" style="background:var(${f.c})"></span>${logoIc(fInst(f.k),34)}<div class="t"><b>${f.nome}${f.novo?'<span class="newtag">NOVA</span>':''}${ultimoReal(f.k)?'<span class="realtag">real · '+compRot(ultimoReal(f.k).comp).split('/')[0]+'</span>':''}</b><span>Função: ${f.funcao}</span><span>${f.tipo} · pagamento: ${f.pag}</span></div><div class="v vv">${f.tipo==='Bolsa'?`<b>${brl(vRef(f)||f.bolsa||0)}</b><small>Bolsa${vRef(f)?'':(f.k==='unitins-tog'?' · a partir de 2027':'')}</small>`:`<b>${brl(Math.round(liqReal(f.k,ANO_FIN+'-'+String(MES_FIN+1).padStart(2,'0'),fo.liq)))}</b><small>Bruto <em>${brl(vRef(f))}</em></small>`}</div><button class="xdel ed-only" type="button" data-del-fonte="${f.k}" aria-label="Remover ${f.nome}">✕</button></div>`}).join('');
 }
 $('fin-chart').addEventListener('mousemove',e=>{
   const h=e.target.closest('.hit'),tip=$('fin-tip');if(!h){tip.style.opacity=0;return}
-  const i=+h.dataset.m,tot=FONTES.reduce((s,x)=>s+x.v[i],0);
-  tip.innerHTML=`<b>${MESES[i]}/2026${i===11?' · previsto':''}</b>`+FONTES.slice().reverse().filter(s=>s.v[i]).map(s=>`<div><span><i style="background:var(${s.c})"></i>${s.nome.split(' · ')[0]}${s.k==='unitins-tog'?' TOG':s.k==='unitins-mba'?' MBA':''}</span>${brl(s.v[i])}</div>`).join('')+`<div class="tot"><span>Total</span>${brl(tot)}</div>`;
+  const i=+h.dataset.m,tot=FONTES.reduce((s,x)=>s+va(x)[i],0);
+  tip.innerHTML=`<b>${MESES[i]}/${ANO_FIN}${i>MES_FIN?' · previsto':''}</b>`+FONTES.slice().reverse().filter(s=>va(s)[i]).map(s=>`<div><span><i style="background:var(${s.c})"></i>${s.nome.split(' · ')[0]}${s.k==='unitins-tog'?' TOG':s.k==='unitins-mba'?' MBA':''}</span>${brl(va(s)[i])}</div>`).join('')+`<div class="tot"><span>Total</span>${brl(tot)}</div>`;
   const wr=$('fin-wrap').getBoundingClientRect();let x=e.clientX-wr.left+14;if(x+200>wr.width)x=e.clientX-wr.left-210;
   tip.style.left=Math.max(0,x)+'px';tip.style.top=Math.max(0,e.clientY-wr.top-60)+'px';tip.style.opacity=1;
 });
 $('fin-chart').addEventListener('mouseleave',()=>$('fin-tip').style.opacity=0);
-$('fin-add').addEventListener('click',()=>toast('No app real, abre o cadastro de nova fonte: instituição, programa e função'));
+$('fin-add').addEventListener('click',()=>novaFonte());
 let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if($('v-financeiro').classList.contains('on'))renderFin();if($('v-descanso').classList.contains('on'))renderLoad()},150)});
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if($('v-financeiro').classList.contains('on'))renderFin()})}catch(_){}
 window.renderFin=renderFin;window.revisarTeste=(r)=>revisar(r,'teste');window.abrirLogos=abrirLogos;window.setEdit=setEdit;window.abrirFoto=abrirFoto;window.abrirAvisos=abrirAvisos;window.renderLoad=renderLoad;window.abrirCC=abrirCC;window.setNt=m=>{ntModo=m;renderNotas()};window.abrirAula=(id,k)=>abrirAula(id,fromKey(k));
@@ -2425,7 +2437,7 @@ function obFonte(i){
   const k='onb-'+i.id,mes=HOJE.getMonth(),bolsa=i.vinc==='Bolsa';
   let val=bolsa?obNum(i.bolsa):(obNum(i.bruto)||obNum(i.liq));
   const v=MESES.map((_,m)=>m>=mes?val:0);
-  const f={k,c:['--s1','--s2','--s3','--s4','--s5'][ONB.insts.indexOf(i)%5],nome:i.nome,inst:i.nome,funcao:i.vinc,tipo:bolsa?'Bolsa':i.vinc,pag:(bolsa?i.bdia:i.dia)||'—',v,prox:[keyOf(HOJE),'próximo pagamento'],novo:true,liq:obNum(bolsa?i.bolsa:i.liq)||null,d13:!bolsa&&!!i.d13};
+  const f={k,c:['--s1','--s2','--s3','--s4','--s5'][ONB.insts.indexOf(i)%5],nome:i.nome,inst:i.nome,funcao:i.vinc,tipo:bolsa?'Bolsa':i.vinc,pag:(bolsa?i.bdia:i.dia)||'—',ano:HOJE.getFullYear(),v,prox:[keyOf(HOJE),'próximo pagamento'],novo:true,liq:obNum(bolsa?i.bolsa:i.liq)||null,d13:!bolsa&&!!i.d13};
   U.fontes=U.fontes.filter(x=>x.k!==k);U.fontes.push(f);const j=FONTES.findIndex(x=>x.k===k);if(j>=0)FONTES.splice(j,1);
 }
 function obAplicaInsts(){ONB.insts.forEach(i=>{obRegInst(i);obFonte(i)});salvaU();aplicaUsuario();try{store.set('cad-logos',Object.fromEntries(Object.entries(LOGOS).filter(([k])=>!LOGOS_PADRAO[k]||LOGOS_PADRAO[k]!==LOGOS[k])))}catch(_){}}

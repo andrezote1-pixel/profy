@@ -1253,7 +1253,6 @@ function alunos(t){
   for(let i=out.length-1;i>=0;i--)if(del.includes(out[i].nome))out.splice(i,1);
   adds.forEach(nm=>{if(!del.includes(nm))out.push({nome:nm,freq:100,n1a:null,n1p:null,n2a:null,n2p:null,rec:null,p:'P',cor:CORES[out.length%CORES.length]})});
   out.sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));t.n=out.length;
-  out.forEach(a=>{const x=r();if(x<.1)a.p='F';else if(x<.13)a.p='J';if(a.n2p!=null&&media(a)<MIN&&media(a)>=3&&r()<.45)a.rec=q(4+r()*6)});
   return t._a=out;
 }
 const ini=n=>n.split(' ').filter(Boolean).map(s=>s[0]).slice(0,2).join('');
@@ -1468,7 +1467,7 @@ function renderAlunos(){
   $('al-eyebrow').textContent=`${t.inst} · ${t.sub}`;$('h-alunos').textContent=t.nome;
   if(t.tipo==='tutoria'){$('al-sum').innerHTML=`<span class="pill">${t.n} alunos acompanhados</span>`;$('al-lista').innerHTML=a.map(s=>`<div class="stu"><div class="av" style="background:${s.cor}" data-esp-novo="${t.id}|${s.nome}" role="button" tabindex="0" title="Situação especial">${ini(s.nome)}</div><div class="t"><b>${s.nome}</b>${espTag(t,s)?`<span>${espTag(t,s)}</span>`:''}<span>Tutoria · ${t.local}</span></div></div>`).join('');return}
   $('al-sum').innerHTML=`<span class="pill">${t.n} alunos</span><span class="pill"><i style="background:var(--bad)"></i>${a.filter(s=>s.freq<75).length} abaixo de 75%</span>`;
-  $('al-lista').innerHTML=a.map(s=>`<div class="stu"><div class="av" style="background:${s.cor}">${ini(s.nome)}</div><div class="t"><b>${s.nome}</b><span class="${s.freq<75?'low':''}">Frequência ${s.freq}% · média ${fmt(media(s)??nota1(s))}</span></div>${sitHtml(situacao(s))}<button class="xdel ed-only" type="button" data-del-aluno="${s.nome}" aria-label="Remover ${s.nome}">✕</button></div>`).join('');
+  $('al-lista').innerHTML=a.map(s=>`<div class="stu"><div class="av" style="background:${s.cor}">${ini(s.nome)}</div><div class="t"><b>${s.nome}</b><span class="${s.freq<75?'low':''}">${s.curso?s.curso+' · ':''}Frequência ${s.freq}% · média ${fmt(media(s)??nota1(s))}</span></div>${sitHtml(situacao(s))}<button class="xdel ed-only" type="button" data-del-aluno="${s.nome}" aria-label="Remover ${s.nome}">✕</button></div>`).join('')||'<div class="vazio" style="padding:18px">Lista de alunos ainda não cadastrada. Ligue o modo de edição para adicionar os nomes.</div>';
 }
 
 

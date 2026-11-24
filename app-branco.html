@@ -454,6 +454,7 @@ main{position:relative}
 .extra .t span{font-size:12.5px;color:var(--ink-2)}
 .extra .v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .extra .v small{display:block;font-size:12px;color:var(--ink-2)}
+.pgx{flex-wrap:wrap}.pga{display:flex;gap:8px;width:100%;align-items:center}.pga input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--ink);padding:9px 12px;border-radius:12px;border:1px solid var(--stroke);background:var(--field)}.pga .btn{flex:none;white-space:nowrap}.pga .btn.soft{margin-left:auto}.kind.kok{background:rgba(30,155,80,.16);color:var(--done-ink)}.st-recebido{color:var(--done-ink);font-weight:800}
 .ccnote{font-size:12.5px;color:var(--ink-2);margin:14px 2px 0}
 .sheet .close{position:sticky;top:0;float:right}
 @media (min-width:960px){
@@ -2282,10 +2283,18 @@ function extras(k){
     {tipo:'13º · 1ª parcela',quando:'Até 30/11 · 50% de 11/12, sem desconto',bruto:2130.95,liq:2130.95,k:'k13'},
     {tipo:'13º · 2ª parcela',quando:'Até 18/12 · com INSS do 13º',bruto:2130.95,liq:1717.95,k:'k13'}];
   {const f=F(k);if(f&&f.tipo!=='Bolsa')return f.d13===false||/Prest/i.test(f.tipo)?[{tipo:'13º e férias',quando:'Este vínculo não paga 13º nem férias',bruto:null,liq:null}]:[{tipo:'13º salário',quando:'1ª parcela até 30/11 e 2ª até 20/12',bruto:null,liq:null,k:'k13'},{tipo:'Férias + 1/3',quando:'Conforme a escala da instituição',bruto:null,liq:null,k:'kfer'}]}
-  return[{tipo:'Bolsa',quando:'Bolsa não tem 13º nem férias',bruto:null,liq:null}]}
+  return[]}
+function pagoS(){return window.__pago||(window.__pago=store.get('cad-pago',{}))}
+function pgMarca(r){const a=absM(r.dt);r.id=r.f.k+'|'+r.tipo+'|'+a;const p=pagoS()[r.id];if(p){r.dt=fromKey(p);r.st='recebido';r.q='caiu '+p.slice(8,10)+'/'+p.slice(5,7)}return r}
+function pagHtml(k){const hj=keyOf(new Date()),L=recebimentos().filter(r=>r.f.k===k).slice(0,4);if(!L.length)return'';
+  return `<div class="card" style="padding:0;margin-top:16px"><h2 style="margin:0 0 4px">Quando caiu</h2></div><div class="extras" data-pgk="${k}">${L.map(r=>{const p=pagoS()[r.id],d=r.dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','').replace(' de ',' ');
+    return `<div class="extra pgx"><div class="t"><b>${r.tipo}<span class="kind ${p?'kok':''}">${p?'caiu':'previsto'}</span></b><span>${p?'Caiu em '+p.split('-').reverse().join('/'):'Previsto: '+(r.q||d)} · ${b2(r.liq)}</span></div><div class="pga">${p?`<button class="btn soft" type="button" data-pg-des="${r.id}">Desfazer</button>`:`<input type="date" value="${hj}" aria-label="Dia em que caiu"><button class="btn" type="button" data-pg-ok="${r.id}">Confirmar</button>`}</div></div>`}).join('')}</div>`}
+document.addEventListener('click',e=>{const o=e.target.closest('[data-pg-ok]'),d=e.target.closest('[data-pg-des]');if(!o&&!d)return;const P=pagoS(),bx=(o||d).closest('[data-pgk]'),k=bx&&bx.dataset.pgk;
+  if(o){const v=o.parentNode.querySelector('input').value;if(!v){toast('Escolha o dia em que caiu');return}P[o.dataset.pgOk]=v}else delete P[d.dataset.pgDes];
+  store.set('cad-pago',P);VER++;try{renderFin()}catch(_){}if(k)abrirCC(k);toast(o?'Pagamento confirmado':'Confirmação desfeita')});
 function recebimentos(){const L=[];
   FONTES.forEach(f=>[ABS_FIN,ABS_FIN+1].forEach(a=>{const y=Math.floor(a/12),m=a%12,b=vMes(f,y,m);if(!b)return;const dt=new Date(y,m+1,0);L.push({dt,f,tipo:(f.tipo==='Bolsa'?'Bolsa de ':'Pagamento de ')+MESN[m],bruto:b,liq:folha(f.k,b).liq,st:'estimado',q:f.pag&&f.pag!=='—'&&f.pag.length<=18?f.pag:''})}));
-  return L.sort((a,b)=>a.dt-b.dt)}
+  return L.map(pgMarca).sort((a,b)=>a.dt-b.dt)}
 const receb=()=>recebimentos().filter(r=>absM(r.dt)===ABS_FIN);
 let rcMes=ABS_FIN;
 const nomeCurto=f=>f.nome.split(' · ')[0]+(f.k==='unitins-mba'?' · MBA':f.k==='unitins-tog'?' · TO Graduado':'');
@@ -2369,7 +2378,7 @@ function ccRealHtml(k,R){const f=F(k),P=(R.itens||[]).filter(i=>i.tipo==='p'),D=
    <div style="display:flex;align-items:center;gap:10px">${logoIc(fInst(k),40)}<span class="kind">${f.tipo}</span><span class="realtag">contracheque real</span></div><h3>${f.nome}</h3><div class="sub">${f.funcao} · competência ${compRot(R.comp)}${R.arquivo?' · '+R.arquivo:''}</div>
    <table class="cc"><thead><tr><th>Descrição</th><th style="text-align:right"></th><th>Valor</th></tr></thead><tbody>${linhas}</tbody></table>
    <div class="liq"><span>Líquido do contracheque</span><b>${b2(R.liq)}</b></div>
-   <div class="card" style="padding:0;margin-top:16px"><h2 style="margin:0 0 4px">Férias e 13º</h2></div>
+   ${pagHtml(k)}${ex.length?`<div class="card" style="padding:0;margin-top:16px"><h2 style="margin:0 0 4px">Férias e 13º</h2></div>`:''}
    <div class="extras">${ex.map(x=>`<div class="extra"><div class="t"><b>${x.tipo}<span class="kind ${x.k||''}">${x.ok?'recebido':'previsto'}</span></b><span>${x.quando}</span></div><div class="v">${x.liq==null?'<b>—</b>':`<b>${b2(x.liq)}</b><small>bruto ${b2(x.bruto)}</small>`}</div></div>`).join('')}</div>
    <button class="impbtn" type="button" data-imp="${k}">📄 Importar outro mês em PDF</button>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-imp]');if(b){abrirImport(b.dataset.imp);return}
@@ -2384,7 +2393,7 @@ function abrirCC(k){const RR=ultimoReal(k);if(RR){$('sheet-in').innerHTML=ccReal
    <div style="display:flex;align-items:center;gap:10px">${logoIc(fInst(k),40)}<span class="kind">${f.tipo}</span></div><h3>${f.nome}</h3><div class="sub">${f.funcao} · competência ${MESN[MES_FIN]}/${ANO_FIN}</div>
    <table class="cc"><thead><tr><th>Descrição</th><th style="text-align:right">Ref.</th><th>Valor</th></tr></thead><tbody>${linhas}</tbody></table>
    <div class="liq"><span>Líquido estimado</span><b>${b2(fo.liq)}</b></div>
-   <div class="card" style="padding:0;margin-top:16px"><h2 style="margin:0 0 4px">Férias e 13º</h2></div>
+   ${pagHtml(k)}${ex.length?`<div class="card" style="padding:0;margin-top:16px"><h2 style="margin:0 0 4px">Férias e 13º</h2></div>`:''}
    <div class="extras">${ex.map(x=>`<div class="extra"><div class="t"><b>${x.tipo}<span class="kind ${x.k||''}">${x.ok?'recebido':'previsto'}</span></b><span>${x.quando}</span></div><div class="v">${x.liq==null?'<b>—</b>':`<b>${b2(x.liq)}</b><small>bruto ${b2(x.bruto)}</small>`}</div></div>`).join('')}</div>
    <p class="ccnote">${CLT[k]?'Estimativa com as tabelas de INSS e IR de 2026. Quando você lançar o contracheque real, os valores dele substituem a estimativa.':'Bolsa: confira no informe de rendimentos se há retenção de IR.'} Pagamento: ${f.pag}.</p>`;
   $('sheet-in').insertAdjacentHTML('beforeend',`<button class="impbtn" type="button" data-imp="${k}">📄 Importar o contracheque real em PDF</button>`);

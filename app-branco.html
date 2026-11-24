@@ -1967,12 +1967,13 @@ function eyebrowHoje(){const d=HOJE,ds_=['Dom','Seg','Ter','Qua','Qui','Sex','S�
 function renderHoje(){eyebrowHoje();
   const bv=$('boasvindas');if(bv)bv.hidden=TURMAS.length>0;
   const h=new Date().getHours();$('h-hoje').textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', '+PERFIL.nome.split(' ').slice(0,2).join(' ');
-  const ev=eventos(HOJE).filter(e=>e.tipo==='aula'||e.tipo==='prova'),e=ev[0];
+  const mnH=x=>{const m=/^(\d{1,2})[h:](\d{2})?/.exec(x||'');return m?(+m[1])*60+(+(m[2]||0)):null},fimH=t=>{const f=mnH(t&&t.fim),i=mnH(t&&t.ini);return f!=null?f:(i!=null?i+120:1440)},agoraM=new Date().getHours()*60+new Date().getMinutes();
+  const ev=eventos(HOJE).filter(e=>e.tipo==='aula'||e.tipo==='prova').slice().sort((a,b)=>(mnH((byId(a.id)||{}).ini)||0)-(mnH((byId(b.id)||{}).ini)||0)),e=ev.find(x=>fimH(byId(x.id))>agoraM);
   let dA=HOJE,eA=e;if(!eA){for(let k=1;k<=21&&!eA;k++){const d=addD(HOJE,k),x=eventos(d).filter(z=>z.tipo==='aula'||z.tipo==='prova')[0];if(x){dA=d;eA=x}}}
   if(eA){const t=byId(eA.id),p=plano(eA.id,dA),hj=dA===HOJE,fer=FERIADOS.some(f=>f.k===keyOf(dA)&&f.esf!=='Facultativo');
-    $('hoje-aula').innerHTML=`<span class="tag">● ${hj?'Hoje':'Próxima aula · '+dShort(dA)} · ${t.ini}</span><h3>${t.nome}</h3><p>${ondeTxt(t.id,dA)} · ${t.n} alunos · aula ${numAula(t.id,dA)}${fer?' · feriado':''}</p>
+    $('hoje-aula').innerHTML=`<span class="tag">● ${hj?(mnH(t.ini)!=null&&mnH(t.ini)<=agoraM?'Agora':'Hoje'):'Próxima aula · '+dShort(dA)} · ${t.ini}</span><h3>${t.nome}</h3><p>${ondeTxt(t.id,dA)} · ${t.n} alunos · aula ${numAula(t.id,dA)}${fer?' · feriado':''}</p>
      <p style="margin-top:8px"><b style="color:var(--ink)">Tema:</b> <span class="${p.tema?'':'low'}" style="${p.tema?'':'color:var(--pend-ink)!important'}">${p.tema||'ainda não definido'}</span></p>
-     <div class="row"><button class="btn" type="button" data-aula="${eA.id}|${keyOf(dA)}">${ICON.bulb}${p.tema?'Ver plano':'Planejar com sugestões'}</button>${hj?`<button class="btn soft" type="button" data-chamada="${eA.id}">Fazer chamada</button>`:''}</div>`}
+     <div class="row"><button class="btn" type="button" data-aula="${eA.id}|${keyOf(dA)}">${ICON.bulb}${p.tema?'Ver plano':'Planejar com sugestões'}</button>${hj&&!t.semCh?`<button class="btn soft" type="button" data-chamada="${eA.id}">${chSalva(eA.id,keyOf(dA))?'Chamada feita ✓':'Fazer chamada'}</button>`:''}</div>`}
   else $('hoje-aula').innerHTML='<span class="tag">Sem aulas nos próximos dias</span><h3>Agenda livre</h3>';
   const prox=[];for(let i=1;i<=7;i++){const d=new Date(HOJE);d.setDate(d.getDate()+i);eventos(d).filter(x=>x.tipo==='aula'||x.tipo==='prova').forEach(x=>prox.push([d,x]))}
   $('proximas').innerHTML=prox.slice(0,7).map(([d,x])=>linhaAula(d,x)).join('');

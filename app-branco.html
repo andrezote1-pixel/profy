@@ -10,6 +10,7 @@
 <title>Profy</title>
 <meta name="apple-mobile-web-app-title" content="Profy">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1931,7 +1932,7 @@ function pushHtml(){const e=window.PROFY_PUSH_ESTADO?PROFY_PUSH_ESTADO():'sem-po
   if(e==='ativo')return '<div class="pushbox on"><b>Notificações do Profy ligadas</b><span>Os avisos do grupo “No celular” chegam na tela do aparelho, com o ícone do Profy.</span><button type="button" class="pb2" data-push="off">Desligar</button></div>';
   if(e==='inativo')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Aula, pagamento e prova aparecem na tela bloqueada, com o ícone do Profy.</span><button type="button" class="pb1" data-push="on">Ativar notificações do Profy</button></div>';
   if(e==='negado')return '<div class="pushbox"><b>Notificações bloqueadas</b><span>Libere em Ajustes do iPhone › Notificações › Profy e volte aqui.</span></div>';
-  if(e==='sem-suporte')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Abra o Profy pelo ícone na Tela de Início do iPhone (iOS 16.4 ou mais novo) para ligar as notificações.</span></div>';
+  if(e==='sem-suporte')return '<div class="pushbox"><b>Receber os avisos no celular</b><span>Para ligar, o Profy precisa estar instalado como app: apague o ícone do Profy, abra o link no Safari, toque em Compartilhar › Adicionar à Tela de Início (com Abrir como App Web ligado) e abra pelo ícone novo.</span></div>';
   return ''}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-push]');if(!b)return;const on=b.dataset.push==='on';b.disabled=true;b.textContent=on?'Ativando…':'Desligando…';
   (on?PROFY_PUSH_ATIVAR():PROFY_PUSH_DESATIVAR()).then(()=>{toast(on?'Notificações do Profy ligadas':'Notificações do Profy desligadas');syncAgenda(true);renderAvisos()}).catch(err=>{const m=String(err&&err.message||err);toast(m==='negado'?'Notificações bloqueadas no iPhone':'Não deu para ativar agora: '+m);renderAvisos()})});

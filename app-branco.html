@@ -1162,7 +1162,7 @@ body.onb-on{overflow:hidden}
     <section class="view" id="v-avisos" aria-labelledby="h-av">
       <div class="head"><div><div class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/></svg><span>Últimos 7 dias</span></div><h1 id="h-av">Avisos</h1></div></div>
       <div class="two">
-        <div><div class="card glass"><div id="av-lista"></div></div></div>
+        <div><div class="pushslot" style="margin-top:-14px;margin-bottom:14px"></div><div class="card glass"><div id="av-lista"></div></div></div>
         <div><div class="card glass"><h2>O que avisar</h2><p class="nota">Escolha o que o Profy avisa. Os marcados com 📱 chegam como notificação no celular depois que você tocar em Ativar notificações do Profy.</p><div id="av-pref"></div></div></div>
       </div>
     </section>
@@ -1182,6 +1182,7 @@ body.onb-on{overflow:hidden}
         <div class="sw2" style="cursor:pointer" onclick="window.abrirCadastro&&abrirCadastro()"><div class="t"><b>Cadastro inicial</b><span>Rever perfil, formação, vínculos e turmas</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
         <div class="sw2" style="cursor:pointer" onclick="window.PROFY_SAIR&&PROFY_SAIR()"><div class="t"><b>Sair da conta</b><span>Seus dados continuam guardados na nuvem</span></div><span class="go" style="color:var(--ink-3)">›</span></div>
       </div>
+      <div class="pushslot"></div>
       <div class="sw2"><div class="t"><b>Aparelhos conectados</b><span>Onde a sua conta foi aberta e quando foi o último acesso</span></div></div>
         <div id="disp-lista"></div>
       <p class="credito">Profy · Desenvolvido por André Gonzaga Aires</p>
@@ -1396,7 +1397,7 @@ function buildNav(){
   $('mais-menu').innerHTML=['turmas','notas','financeiro','lancar','descanso'].map(k=>`<a href="#${k}"><span class="ic" style="background:${cor[k]}">${ICON[k]}</span><span>${LABEL[k]}<small>${sub[k]}</small></span><span class="go">›</span></a>`).join('');
 }
 const PAI={aula:'calendario',alunos:'turmas'};
-const RENDER={avisos:()=>renderAvisos(),hoje:()=>renderHoje(),turmas:()=>renderTurmas(),chamada:()=>renderChamada(),notas:()=>renderNotas(),lancar:()=>renderLancar(),calendario:()=>renderCal(),descanso:()=>renderDescanso(),alunos:()=>renderAlunos(),mais:()=>renderDisp()};
+const RENDER={avisos:()=>renderAvisos(),hoje:()=>renderHoje(),turmas:()=>renderTurmas(),chamada:()=>renderChamada(),notas:()=>renderNotas(),lancar:()=>renderLancar(),calendario:()=>renderCal(),descanso:()=>renderDescanso(),alunos:()=>renderAlunos(),mais:()=>{renderDisp();try{pushSlots()}catch(_){}}};
 function show(){
   let k=(location.hash||'#hoje').slice(1);if(!LABEL[k])k='hoje';
   if(k==='aula'&&!selAula){k='calendario'}
@@ -1937,10 +1938,11 @@ function pushHtml(){const e=window.PROFY_PUSH_ESTADO?PROFY_PUSH_ESTADO():'sem-po
   return `<div class="pushbox"><b>Ativar notificações do Profy</b><span>Abra o Profy pelo link andrezote1-pixel.github.io/profy, ou pelo ícone na Tela de Início, para ligar as notificações.</span>${dg}</div>`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-push]');if(!b)return;const on=b.dataset.push==='on';b.disabled=true;b.textContent=on?'Ativando…':'Desligando…';
   (on?PROFY_PUSH_ATIVAR():PROFY_PUSH_DESATIVAR()).then(()=>{toast(on?'Notificações do Profy ligadas':'Notificações do Profy desligadas');syncAgenda(true);renderAvisos()}).catch(err=>{const m=String(err&&err.message||err);toast(m==='negado'?'Notificações bloqueadas no iPhone':'Não deu para ativar agora: '+m);renderAvisos()})});
-function renderAvisos(){const L=avisos().slice(0,60);let g='',h='';
+function pushSlots(){document.querySelectorAll('.pushslot').forEach(x=>x.innerHTML=pushHtml())}
+function renderAvisos(){pushSlots();const L=avisos().slice(0,60);let g='',h='';
   L.forEach(a=>{const r=diaRot(a.at),novo=a.at>VISTO;if(r!==g){g=r;h+=`<div class="nt-grp">${r}</div>`}h+=`<div class="nt${novo?' novo':''}" data-av-go="${a.go}" style="cursor:pointer"><span class="ic" style="background:${a.cor}">${a.ic}</span><div class="t"><b>${a.tit}${PUSH.has(a.tipo)?'<span class="pushtag">📱 celular</span>':''}</b><span>${a.txt}</span></div><time>${String(a.at.getHours()).padStart(2,'0')}h${String(a.at.getMinutes()).padStart(2,'0')}</time></div>`});
   $('av-lista').innerHTML=h||'<p class="demo">Nenhum aviso chegou ainda.</p>';
-  $('av-pref').innerHTML=pushHtml()+PREF_G.map(([gr,l])=>`<div class="prefgrp">${gr}</div>`+l.map(([k,t,d])=>`<div class="sw2"><div class="t"><b>${t}</b><span>${d}</span></div><button class="tog" type="button" data-pref="${k}" aria-pressed="${!!PREF[k]}" aria-label="${t}"></button></div>`).join('')).join('')+'<p class="ccnote">Os avisos também aparecem aqui, no sininho do app.</p>';
+  $('av-pref').innerHTML=PREF_G.map(([gr,l])=>`<div class="prefgrp">${gr}</div>`+l.map(([k,t,d])=>`<div class="sw2"><div class="t"><b>${t}</b><span>${d}</span></div><button class="tog" type="button" data-pref="${k}" aria-pressed="${!!PREF[k]}" aria-label="${t}"></button></div>`).join('')).join('')+'<p class="ccnote">Os avisos também aparecem aqui, no sininho do app.</p>';
   setTimeout(()=>{VISTO=new Date(AGORA.getTime()+1000);store.set('cad-avisos-visto',VISTO.getTime());badge()},1500)}
 function abrirAvisos(){go('avisos')}
 document.addEventListener('click',e=>{const p=e.target.closest('[data-pref]');if(p){PREF[p.dataset.pref]=!PREF[p.dataset.pref];store.set('cad-avisos',PREF);VER++;renderAvisos();badge();syncAgenda(true);return}

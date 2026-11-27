@@ -260,7 +260,7 @@ function PROFY_ATUALIZA(){
 }
 function escrever(html,ponteFn){
   try{sessionStorage.setItem('profy-exibido',profyHash(html))}catch(e){}
-  var ponte='<script>('+(ponteFn||PROFY_PONTE).toString()+')();('+PROFY_PUSH.toString()+')();('+PROFY_ATUALIZA.toString()+')();<\/script>';
+  var ponte=(/rel=["']?manifest/i.test(html)?'':'<link rel="manifest" href="manifest.webmanifest">')+'<script>('+(ponteFn||PROFY_PONTE).toString()+')();('+PROFY_PUSH.toString()+')();('+PROFY_ATUALIZA.toString()+')();<\/script>';
   html=/<head[^>]*>/i.test(html)?html.replace(/<head[^>]*>/i,function(h){return h+ponte}):ponte+html;
   var ir=function(){setTimeout(function(){document.open();document.write(html);document.close()},0)};
   if(document.readyState==='complete')ir();else window.addEventListener('load',ir);
